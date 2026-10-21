@@ -1,12 +1,12 @@
-# 📚 Índice de Documentación
+# 👗 Índice de Documentación
 
-Bienvenido a la documentación del Sistema de Tienda Online de Libros. Aquí encontrarás toda la información que necesitas para entender, instalar y usar la aplicación.
+Bienvenido a la documentación del Névora Moda! – Sistema de Tienda Online de Ropa. Aquí encontrarás toda la información que necesitas para entender, instalar y usar la aplicación.
 
 ---
 
 ## 🗂️ Contenido Disponible
 
-### 📖 [README.md](../README.md) - Comienza aquí
+### 👕 [README.md](../README.md) - Comienza aquí
 Información general del proyecto:
 - 🎯 Características principales
 - 🛠️ Tecnologías utilizadas
@@ -42,7 +42,7 @@ Descripción detallada de cada página:
 - 📝 Registro e inicio de sesión
 - 🔑 Gestión de contraseña
 - ⭐ Seleccionar categorías favoritas
-- 📚 Catálogo con búsqueda y filtros
+- 👗 Catálogo con búsqueda y filtros
 - 🛒 Carrito de compras
 - 💳 Checkout y pago
 - 📋 Pedidos e historial
@@ -58,7 +58,7 @@ Descripción detallada de cada página:
 ### 🗄️ [MODELOS.md](MODELOS.md) - Base de Datos
 Documentación de modelos y relaciones:
 - 📌 User (Usuarios)
-- 📖 Book (Libros)
+- 👕 Product (Productos)
 - 🛒 Cart (Carrito)
 - 📦 CartItem (Items del carrito)
 - 📋 Order (Pedidos)
@@ -78,7 +78,7 @@ Documentación de modelos y relaciones:
 ### 👤 Si eres Usuario Final
 1. Lee [README.md](../README.md) - Características
 2. Lee [PAGINAS.md](PAGINAS.md) - Cómo usar
-3. ¡Comienza a comprar! 📚
+3. ¡Comienza a comprar! 👗
 
 ### 💻 Si eres Desarrollador
 1. Lee [README.md](../README.md) - Introducción
@@ -103,7 +103,7 @@ Documentación de modelos y relaciones:
 
 ---
 
-## 📚 Tabla Rápida de Referencias
+## 👗 Tabla Rápida de Referencias
 
 ### Instalación
 - **Primera vez**: [INSTALACION.md - Paso 1-7](INSTALACION.md#windows)
@@ -113,7 +113,7 @@ Documentación de modelos y relaciones:
 
 ### Características
 - **Autenticación**: [PAGINAS.md - Registro y Login](PAGINAS.md#📝-registro-registro)
-- **Catálogo**: [PAGINAS.md - Catálogo](PAGINAS.md#📚-catálogo-catalogo)
+- **Catálogo**: [PAGINAS.md - Catálogo](PAGINAS.md#👗-catálogo-catalogo)
 - **Compra**: [PAGINAS.md - Checkout](PAGINAS.md#💳-checkout-checkout)
 - **Admin**: [PAGINAS.md - Panel Admin](PAGINAS.md#-panel-admin-admin)
 
@@ -128,9 +128,9 @@ Documentación de modelos y relaciones:
 ## 🔗 Links Rápidos
 
 ### Repositorio
-- **GitHub**: [Luisa-0o/ProyectoFlask_POO1](https://github.com/Luisa-0o/ProyectoFlask_POO1)
-- **Issues**: [Reportar problemas](https://github.com/Luisa-0o/ProyectoFlask_POO1/issues)
-- **Discussions**: [Hacer preguntas](https://github.com/Luisa-0o/ProyectoFlask_POO1/discussions)
+- **GitHub**: [Luisa-0o/TiendaOnline_ISI](https://github.com/Luisa-0o/TiendaOnline_ISI)
+- **Issues**: [Reportar problemas](https://github.com/Luisa-0o/TiendaOnline_ISI/issues)
+- **Discussions**: [Hacer preguntas](https://github.com/Luisa-0o/TiendaOnline_ISI/discussions)
 
 ### Tecnologías
 - **Flask**: [flask.palletsprojects.com](https://flask.palletsprojects.com/)
@@ -161,20 +161,20 @@ Ver [README.md - Roles](../README.md#-tipos-de-usuario-y-roles).
 Ir a `http://localhost:5000/change-password`.
 Ver [PAGINAS.md - Cambiar Contraseña](PAGINAS.md#-cambiar-contraseña-change-password).
 
-### ¿Cómo cargo libros?
-Siendo admin, ir a `/admin/books/create`.
-Ver [PAGINAS.md - Crear Libro](PAGINAS.md#crear-libro-admin-bookscreate).
+### ¿Cómo cargo productos?
+Siendo admin, ir a `/admin/products/create`.
+Ver [PAGINAS.md - Crear Producto](PAGINAS.md#crear-producto-adminproductscreate).
 
-### ¿Cómo compro un libro?
+### ¿Cómo compro un producto?
 1. Navega al catálogo (`/catalogo`)
-2. Haz click en un libro
+2. Haz click en un producto
 3. Selecciona cantidad
 4. "Agregar al carrito"
 5. Revisa carrito (`/cart`)
 6. "Checkout"
 7. Completa formulario de pago
 
-Ver [PAGINAS.md - Flujo de Compra](PAGINAS.md#-agregar-al-carrito-cart-addbook_id).
+Ver [PAGINAS.md - Flujo de Compra](PAGINAS.md#-agregar-al-carrito-cart-addproduct_id).
 
 ### ¿Cómo veo mis facturas?
 Ve a `/orders`, haz click en un pedido, luego "Ver Factura".
@@ -207,7 +207,7 @@ Ver [README.md - Seguridad](../README.md#-seguridad-implementada).
 
 ## 📞 Contacto y Soporte
 
-- **Autor**: Luisa Builes
+- **Marca**: Luisa Builes
 - **GitHub**: [@Luisa-0o](https://github.com/Luisa-0o)
 - **Email**: (Ver perfil de GitHub)
 
@@ -220,7 +220,7 @@ Ver [README.md - Seguridad](../README.md#-seguridad-implementada).
 - [ ] Ejecuté la aplicación sin errores
 - [ ] Creé usuario admin (primer registro)
 - [ ] Exploré el panel admin
-- [ ] Agregué algunos libros
+- [ ] Agregué algunos productos
 - [ ] Hice una compra de prueba
 - [ ] Descargué una factura
 - [ ] Cambié de contraseña

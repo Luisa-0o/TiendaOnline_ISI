@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>{{ action }} libro</h2>
+<h2>{{ action }} producto</h2>
 <form method="POST" enctype="multipart/form-data">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   {{ form.hidden_tag() }}
   <div class="mb-3">
-    {{ form.title.label }} {{ form.title(class="form-control") }}
+    {{ form.name.label }} {{ form.name(class="form-control") }}
   </div>
   <div class="mb-3">
-    {{ form.author.label }} {{ form.author(class="form-control") }}
+    {{ form.brand.label }} {{ form.brand(class="form-control") }}
   </div>
   <div class="mb-3">
     {{ form.category.label }} {{ form.category(class="form-control") }}
@@ -23,19 +23,19 @@
     {{ form.description.label }} {{ form.description(class="form-control", rows=4) }}
   </div>
   <div class="mb-3">
-    {{ form.cover.label }} {{ form.cover() }}
-    {% if book and book.cover_filename %}
-      <p>Portada actual:</p>
+    {{ form.image.label }} {{ form.image() }}
+    {% if product and product.image_filename %}
+      <p>Imagen actual:</p>
       <img 
-        src="{{ url_for('static', filename='covers/' ~ book.cover_filename) }}" 
-        alt="Portada del libro {{ book.title }}" 
+        src="{{ url_for('static', filename='uploads/' ~ product.image_filename) }}" 
+        alt="Foto de {{ product.name }}" 
         style="height:90px;"
       >
     {% endif %}
   </div>
   <div class="mb-3">
     {{ form.submit(class="btn btn-primary") }}
-    <a href="{{ url_for('admin_books') }}" class="btn btn-secondary">Cancelar</a>
+    <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">Cancelar</a>
   </div>
 </form>
 {% endblock %}

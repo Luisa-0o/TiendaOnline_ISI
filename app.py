@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, flash, request
 from config import Config
-from models import db, User, Book, Cart, CartItem, Order, OrderItem
-from forms import RegisterForm, LoginForm, ChangePasswordForm, BookForm
+from models import db, User, Product, Cart, CartItem, Order, OrderItem
+from forms import RegisterForm, LoginForm, ChangePasswordForm, ProductForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_migrate import Migrate
 from dotenv import load_dotenv
@@ -135,25 +135,25 @@ def admin():
     return render_template('admin.html', users=users)
 
 
-# --- CRUD Libros ---
-@app.route('/admin/books')
+# --- CRUD Productos ---
+@app.route('/admin/products')
 @login_required
 @admin_required
-def admin_books():
-    books = Book.query.order_by(Book.id.desc()).all()
-    return render_template('admin_books.html', books=books)
+def admin_products():
+    products = Product.query.order_by(Product.id.desc()).all()
+    return render_template('admin_products.html', products=products)
 
 
-@app.route('/admin/books/create', methods=['GET', 'POST'])
+@app.route('/admin/products/create', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def create_book():
-    form = BookForm()
+def create_product():
+    form = ProductForm()
     if form.validate_on_submit():
         filename = None
-        if form.cover.data:
+        if form.image.data:
             try:
-                f = form.cover.data
+                f = form.image.data
                 filename = secure_filename(f.filename)
                 upload_folder = os.path.join('static', 'uploads')
                 os.makedirs(upload_folder, exist_ok=True)
@@ -162,67 +162,67 @@ def create_book():
                 app.logger.error(f"Error al guardar la imagen: {e}")
                 flash("Error al guardar la imagen.", "danger")
 
-        book = Book(
-            title=form.title.data,
-            author=form.author.data,
+        product = Product(
+            name=form.name.data,
+            brand=form.brand.data,
             category=form.category.data,
             price=form.price.data,
             stock=form.stock.data,
             description=form.description.data,
-            cover_filename=filename
+            image_filename=filename
         )
-        db.session.add(book)
+        db.session.add(product)
         db.session.commit()
-        flash('Libro creado correctamente.', 'success')
-        return redirect(url_for('admin_books'))
-    return render_template('edit_book.html', form=form, action='Crear')
+        flash('Producto creado correctamente.', 'success')
+        return redirect(url_for('admin_products'))
+    return render_template('edit_product.html', form=form, action='Crear')
 
 
-@app.route('/admin/books/edit/<int:book_id>', methods=['GET', 'POST'])
+@app.route('/admin/products/edit/<int:product_id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def edit_book(book_id):
-    book = Book.query.get_or_404(book_id)
-    form = BookForm(obj=book)
+def edit_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    form = ProductForm(obj=product)
     if form.validate_on_submit():
-        if form.cover.data:
+        if form.image.data:
             try:
-                f = form.cover.data
+                f = form.image.data
                 filename = secure_filename(f.filename)
                 upload_folder = os.path.join('static', 'uploads')
                 os.makedirs(upload_folder, exist_ok=True)
                 f.save(os.path.join(upload_folder, filename))
-                book.cover_filename = filename
+                product.image_filename = filename
             except OSError as e:
                 app.logger.error(f"Error al actualizar la imagen: {e}")
                 flash("Error al actualizar la imagen.", "danger")
 
-        book.title = form.title.data
-        book.author = form.author.data
-        book.category = form.category.data
-        book.price = form.price.data
-        book.stock = form.stock.data
-        book.description = form.description.data
+        product.name = form.name.data
+        product.brand = form.brand.data
+        product.category = form.category.data
+        product.price = form.price.data
+        product.stock = form.stock.data
+        product.description = form.description.data
         db.session.commit()
-        flash('Libro actualizado.', 'success')
-        return redirect(url_for('admin_books'))
-    return render_template('edit_book.html', form=form, action='Editar', book=book)
+        flash('Producto actualizado.', 'success')
+        return redirect(url_for('admin_products'))
+    return render_template('edit_product.html', form=form, action='Editar', product=product)
 
 
-@app.route('/admin/books/delete/<int:book_id>', methods=['POST'])
+@app.route('/admin/products/delete/<int:product_id>', methods=['POST'])
 @login_required
 @admin_required
-def delete_book(book_id):
-    book = Book.query.get_or_404(book_id)
-    existing_orders = OrderItem.query.filter_by(book_id=book.id).first()
+def delete_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    existing_orders = OrderItem.query.filter_by(product_id=product.id).first()
     if existing_orders:
-        flash("⚠️ No puedes eliminar este libro porque tiene pedidos registrados.", "warning")
-        return redirect(url_for('admin_books'))
+        flash("⚠️ No puedes eliminar este producto porque tiene pedidos registrados.", "warning")
+        return redirect(url_for('admin_products'))
 
-    db.session.delete(book)
+    db.session.delete(product)
     db.session.commit()
-    flash("✅ Libro eliminado correctamente.", "success")
-    return redirect(url_for('admin_books'))
+    flash("✅ Producto eliminado correctamente.", "success")
+    return redirect(url_for('admin_products'))
 
 
 # --- CRUD Usuarios (ADMIN) ---
@@ -290,37 +290,37 @@ def catalogo():
     query = request.args.get('q', '').strip()
     selected_category = request.args.get('category', '').strip()
 
-    books_q = Book.query
+    products_q = Product.query
     if query:
-        books_q = books_q.filter(
-            (Book.title.ilike(f'%{query}%')) |
-            (Book.author.ilike(f'%{query}%'))
+        products_q = products_q.filter(
+            (Product.name.ilike(f'%{query}%')) |
+            (Product.brand.ilike(f'%{query}%'))
         )
     if selected_category:
-        books_q = books_q.filter(Book.category == selected_category)
+        products_q = products_q.filter(Product.category == selected_category)
 
-    books = books_q.order_by(Book.id.desc()).all()
+    products = products_q.order_by(Product.id.desc()).all()
 
     # Obtener lista de categorías existentes (no nulas)
-    categories = [c[0] for c in db.session.query(Book.category).filter(Book.category != None).distinct().order_by(Book.category).all()]
+    categories = [c[0] for c in db.session.query(Product.category).filter(Product.category != None).distinct().order_by(Product.category).all()]
 
     # Recomendaciones basadas en las 2 categorías favoritas del usuario (solo para usuarios normales)
-    recommended_books = []
+    recommended_products = []
     if current_user.is_authenticated and not getattr(current_user, 'is_admin', False):
         fav1 = getattr(current_user, 'fav_category1', None)
         fav2 = getattr(current_user, 'fav_category2', None)
         favs = [c for c in (fav1, fav2) if c]
         if favs:
-            recommended_books = Book.query.filter(Book.category.in_(favs)).order_by(Book.id.desc()).limit(8).all()
+            recommended_products = Product.query.filter(Product.category.in_(favs)).order_by(Product.id.desc()).limit(8).all()
 
-    return render_template('catalogo.html', books=books, query=query, categories=categories, selected_category=selected_category, recommended_books=recommended_books)
+    return render_template('catalogo.html', products=products, query=query, categories=categories, selected_category=selected_category, recommended_products=recommended_products)
 
 
 @app.route('/select-favs', methods=['GET', 'POST'])
 @login_required
 def select_favs():
     # Obtener categorías disponibles
-    categories = [c[0] for c in db.session.query(Book.category).filter(Book.category != None).distinct().order_by(Book.category).all()]
+    categories = [c[0] for c in db.session.query(Product.category).filter(Product.category != None).distinct().order_by(Product.category).all()]
 
     # Si es admin, no necesita seleccionar preferencias
     if current_user.is_authenticated and getattr(current_user, 'is_admin', False):
@@ -359,17 +359,17 @@ def view_cart():
     return render_template('cart.html', cart=cart, items=items, total=total)
 
 
-@app.route('/cart/add/<int:book_id>', methods=['GET', 'POST'])
+@app.route('/cart/add/<int:product_id>', methods=['GET', 'POST'])
 @login_required
-def add_to_cart(book_id):
-    book = Book.query.get_or_404(book_id)
+def add_to_cart(product_id):
+    product = Product.query.get_or_404(product_id)
     qty = int(request.form.get('quantity', 1)) if request.method == 'POST' else int(request.args.get('quantity', 1))
 
     if qty <= 0:
         flash('Cantidad inválida.', 'warning')
         return redirect(url_for('catalogo'))
 
-    if book.stock < qty:
+    if product.stock < qty:
         flash('No hay suficiente stock disponible.', 'danger')
         return redirect(url_for('catalogo'))
 
@@ -379,18 +379,18 @@ def add_to_cart(book_id):
         db.session.add(cart)
         db.session.commit()
 
-    item = CartItem.query.filter_by(cart_id=cart.id, book_id=book.id).first()
+    item = CartItem.query.filter_by(cart_id=cart.id, product_id=product.id).first()
     if item:
-        if book.stock < item.quantity + qty:
+        if product.stock < item.quantity + qty:
             flash('No hay suficiente stock para aumentar la cantidad.', 'danger')
             return redirect(url_for('catalogo'))
         item.quantity += qty
     else:
-        item = CartItem(cart_id=cart.id, book_id=book.id, quantity=qty)
+        item = CartItem(cart_id=cart.id, product_id=product.id, quantity=qty)
         db.session.add(item)
 
     db.session.commit()
-    flash(f'✅ Añadido {qty} x "{book.title}" al carrito.', 'success')
+    flash(f'✅ Añadido {qty} x "{product.name}" al carrito.', 'success')
     return redirect(url_for('catalogo'))
 
 
@@ -409,10 +409,10 @@ def remove_from_cart(item_id):
 
     if item.quantity > 1:
         item.quantity -= 1
-        flash(f"Se eliminó una unidad de '{item.book.title}'.", "info")
+        flash(f"Se eliminó una unidad de '{item.product.name}'.", "info")
     else:
         db.session.delete(item)
-        flash(f"'{item.book.title}' fue eliminado del carrito.", "success")
+        flash(f"'{item.product.name}' fue eliminado del carrito.", "success")
 
     db.session.commit()
     return redirect(url_for('view_cart'))
@@ -428,8 +428,8 @@ def checkout():
 
     # Validar stock
     for item in cart.items:
-        if item.book.stock < item.quantity:
-            flash(f'No hay suficiente stock para "{item.book.title}".', 'danger')
+        if item.product.stock < item.quantity:
+            flash(f'No hay suficiente stock para "{item.product.name}".', 'danger')
             return redirect(url_for('view_cart'))
 
     # Crear pedido
@@ -440,9 +440,9 @@ def checkout():
 
         total = 0.0
         for item in cart.items:
-            item.book.stock -= item.quantity
-            price = item.book.price or 0.0
-            order_item = OrderItem(order_id=order.id, book_id=item.book_id, quantity=item.quantity, price=price)
+            item.product.stock -= item.quantity
+            price = item.product.price or 0.0
+            order_item = OrderItem(order_id=order.id, product_id=item.product_id, quantity=item.quantity, price=price)
             db.session.add(order_item)
             total += price * item.quantity
             db.session.delete(item)
@@ -495,9 +495,9 @@ def cancel_order(order_id):
         flash(f'No puedes cancelar un pedido en estado "{order.status}".', 'warning')
         return redirect(url_for('view_order', order_id=order_id))
 
-    # Restaurar el stock de los libros
+    # Restaurar el stock de los productos
     for item in order.items:
-        item.book.stock += item.quantity
+        item.product.stock += item.quantity
 
     # Cambiar estado a cancelado
     order.status = 'cancelled'

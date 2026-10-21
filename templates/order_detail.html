@@ -53,7 +53,7 @@
     <div class="card mb-4 bg-warning bg-opacity-10 border-warning">
       <div class="card-body">
         <h5 class="card-title">⚠️ Cancelar Pedido</h5>
-        <p class="card-text text-muted">Puedes cancelar este pedido. El stock de los libros será restaurado automáticamente.</p>
+        <p class="card-text text-muted">Puedes cancelar este pedido.</p>
         <form method="POST" action="{{ url_for('cancel_order', order_id=order.id) }}" class="d-inline">
           <!-- CSRF token required by Flask-WTF -->
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -69,7 +69,7 @@
   <table class="table table-striped">
     <thead class="table-dark">
       <tr>
-        <th>Libro</th>
+        <th>Producto</th>
         <th>Cantidad</th>
         <th>Precio unidad</th>
         <th>Subtotal</th>
@@ -78,7 +78,7 @@
     <tbody>
       {% for item in order.items %}
       <tr>
-        <td>{{ item.book.title }}</td>
+        <td>{{ item.product.name }}</td>
         <td>{{ item.quantity }}</td>
         <td>${{ "%.2f"|format(item.price) }}</td>
         <td>${{ "%.2f"|format(item.quantity * item.price) }}</td>

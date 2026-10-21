@@ -33,12 +33,12 @@ class ChangePasswordForm(FlaskForm):
     new_password2 = PasswordField('Confirmar nueva contraseña', validators=[DataRequired(), EqualTo('new_password')])
     submit = SubmitField('Cambiar contraseña')
 
-class BookForm(FlaskForm):
-    title = StringField('Título', validators=[DataRequired(), Length(max=200)])
-    author = StringField('Autor', validators=[DataRequired(), Length(max=200)])
-    category = StringField('Categoría', validators=[Optional(), Length(max=100)])
+class ProductForm(FlaskForm):
+    name = StringField('Nombre de la prenda', validators=[DataRequired(), Length(max=200)])
+    brand = StringField('Marca', validators=[DataRequired(), Length(max=200)])
+    category = StringField('Categoría (Camisas, Pantalones, Zapatos, Accesorios...)', validators=[Optional(), Length(max=100)])
     price = FloatField('Precio', validators=[DataRequired(), NumberRange(min=0)])
     stock = IntegerField('Stock', validators=[DataRequired(), NumberRange(min=0)])
     description = TextAreaField('Descripción', validators=[Optional(), Length(max=2000)])
-    cover = FileField('Portada (opcional)', validators=[Optional(), FileAllowed(['jpg','jpeg','png'], 'Solo imágenes')])
+    image = FileField('Foto de la prenda (opcional)', validators=[Optional(), FileAllowed(['jpg','jpeg','png'], 'Solo imágenes')])
     submit = SubmitField('Guardar')

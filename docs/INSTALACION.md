@@ -41,8 +41,8 @@ Asegúrate de tener instalado:
 
 #### Paso 2: Clonar Repositorio
 ```bash
-git clone https://github.com/Luisa-0o/ProyectoFlask_POO1.git
-cd New_Repo_Flask
+git clone https://github.com/Luisa-0o/TiendaOnline_ISI.git
+cd TiendaOnline_ISI
 ```
 
 #### Paso 3: Crear Entorno Virtual
@@ -102,8 +102,8 @@ sudo apt-get install python3 python3-pip python3-venv git
 
 #### Paso 2: Clonar Repositorio
 ```bash
-git clone https://github.com/Luisa-0o/ProyectoFlask_POO1.git
-cd New_Repo_Flask
+git clone https://github.com/Luisa-0o/TiendaOnline_ISI.git
+cd TiendaOnline_ISI
 ```
 
 #### Paso 3: Crear Entorno Virtual
@@ -161,8 +161,8 @@ brew install python3 git
 
 #### Paso 3: Clonar Repositorio
 ```bash
-git clone https://github.com/Luisa-0o/ProyectoFlask_POO1.git
-cd New_Repo_Flask
+git clone https://github.com/Luisa-0o/TiendaOnline_ISI.git
+cd TiendaOnline_ISI
 ```
 
 #### Paso 4: Crear Entorno Virtual
@@ -211,13 +211,13 @@ sudo -u postgres psql
 
 En la consola psql:
 ```sql
-CREATE DATABASE bookstore;
-CREATE USER bookstore_user WITH PASSWORD 'contraseña_segura';
-ALTER ROLE bookstore_user SET client_encoding TO 'utf8';
-ALTER ROLE bookstore_user SET default_transaction_isolation TO 'read committed';
-ALTER ROLE bookstore_user SET default_transaction_deferrable TO on;
-ALTER ROLE bookstore_user SET default_transaction_isolation TO 'read committed';
-GRANT ALL PRIVILEGES ON DATABASE bookstore TO bookstore_user;
+CREATE DATABASE nevora_moda;
+CREATE USER nevora_user WITH PASSWORD 'contraseña_segura';
+ALTER ROLE nevora_user SET client_encoding TO 'utf8';
+ALTER ROLE nevora_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE nevora_user SET default_transaction_deferrable TO on;
+ALTER ROLE nevora_user SET default_transaction_isolation TO 'read committed';
+GRANT ALL PRIVILEGES ON DATABASE nevora_moda TO nevora_user;
 \q
 ```
 
@@ -227,7 +227,7 @@ nano .env
 ```
 
 ```
-DATABASE_URL=postgresql://bookstore_user:contraseña_segura@localhost:5432/bookstore
+DATABASE_URL=postgresql://nevora_user:contraseña_segura@localhost:5432/nevora_moda
 SECRET_KEY=tu-clave-secreta-muy-segura-aqui
 FLASK_ENV=production
 ```
@@ -384,7 +384,7 @@ flask db upgrade
 
 ---
 
-### Error al subir imágenes de portadas
+### Error al subir imágenes de imágenes
 
 **Causa**: Carpeta `static/uploads/` no existe
 
@@ -492,11 +492,11 @@ db.session.commit()
 ## 📁 Estructura de Carpetas Después de Instalación
 
 ```
-New_Repo_Flask/
+TiendaOnline_ISI/
 ├── venv/                      # Entorno virtual (creado)
 ├── migrations/                # Migraciones (creado si no existen)
 ├── static/
-│   └── uploads/              # Portadas (crear si no existe)
+│   └── uploads/              # Imágenes (crear si no existe)
 ├── app.py
 ├── models.py
 ├── forms.py
@@ -551,7 +551,7 @@ New_Repo_Flask/
 
 ---
 
-## 📖 Próximos Pasos
+## 👕 Próximos Pasos
 
 Después de instalar:
 
@@ -559,7 +559,7 @@ Después de instalar:
 2. ✅ Lee [PAGINAS.md](PAGINAS.md) para entender las rutas
 3. ✅ Lee [MODELOS.md](MODELOS.md) para entender la BD
 4. ✅ Explora el código en `app.py`
-5. ✅ Crea algunos libros desde el panel admin
+5. ✅ Crea algunos productos desde el panel admin
 6. ✅ Realiza una compra de prueba
 
 ---

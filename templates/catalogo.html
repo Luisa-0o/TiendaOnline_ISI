@@ -3,8 +3,8 @@
 {% block title %}Catálogo{% endblock %}
 
 {% block content %}
-<div class="bi bi-book-fill">
-  <h2> Catálogo de libros</h2>
+<div class="bi bi-bag-fill">
+  <h2> Catálogo de ropa</h2>
 
   <form id="searchForm" method="GET" action="{{ url_for('catalogo') }}" class="d-flex my-3 gap-2">
     <input 
@@ -12,7 +12,7 @@
       class="form-control me-2" 
       type="search" 
       name="q" 
-      placeholder="Buscar por título o autor" 
+      placeholder="Buscar por nombre o marca" 
       value="{{ query }}"
       autocomplete="off">
 
@@ -30,33 +30,33 @@
   </form>
 
   {# Recomendaciones basadas en las 2 categorías favoritas del usuario (solo usuarios normales) #}
-  {% if recommended_books and not current_user.is_admin %}
+  {% if recommended_products and not current_user.is_admin %}
     <div class="mt-4">
-      <h4>✨ Estos libros te pueden interesar</h4>
+      <h4>✨ Estas prendas te pueden interesar</h4>
       <div class="row mb-3">
-        {% for book in recommended_books %}
+        {% for product in recommended_products %}
           <div class="col-md-3 mb-3">
             <div class="card h-100">
-              {% if book.cover_filename %}
-                <img src="{{ url_for('static', filename='uploads/' + book.cover_filename) }}" 
-                  alt="Portada del libro {{ book.title }}" 
+              {% if product.image_filename %}
+                <img src="{{ url_for('static', filename='uploads/' + product.image_filename) }}" 
+                  alt="Foto de {{ product.name }}" 
                   class="card-img-top" 
                   style="height:160px; object-fit:contain; background:#f8f9fa">
               {% else %}
-                <img src="{{ url_for('static', filename='no_cover.png') }}" 
-                  alt="Sin portada disponible" 
+                <img src="{{ url_for('static', filename='no_image.png') }}" 
+                  alt="Sin imagen disponible" 
                   class="card-img-top" 
                   style="height:160px; object-fit:contain; background:#f8f9fa">
               {% endif %}
 
               <div class="card-body p-2">
-                <h6 class="card-title mb-1">{{ book.title }}</h6>
-                <p class="card-text small mb-1">{{ book.author }}</p>
-                {% if book.description %}
-                  <p class="card-text small text-muted mb-1" style="min-height:2em;max-height:4em;overflow:auto;">{{ book.description }}</p>
+                <h6 class="card-title mb-1">{{ product.name }}</h6>
+                <p class="card-text small mb-1">{{ product.brand }}</p>
+                {% if product.description %}
+                  <p class="card-text small text-muted mb-1" style="min-height:2em;max-height:4em;overflow:auto;">{{ product.description }}</p>
                 {% endif %}
-                <p class="card-text small"><strong>${{ "%.2f"|format(book.price) }}</strong></p>
-                <a href="{{ url_for('add_to_cart', book_id=book.id, quantity=1) }}" class="btn btn-sm btn-outline-primary d-block">Añadir (1)</a>
+                <p class="card-text small"><strong>${{ "%.2f"|format(product.price) }}</strong></p>
+                <a href="{{ url_for('add_to_cart', product_id=product.id, quantity=1) }}" class="btn btn-sm btn-outline-primary d-block">Añadir (1)</a>
               </div>
             </div>
           </div>
@@ -96,40 +96,40 @@
   </script>
 
   <div class="row">
-    {% if books %}
-      {% for book in books %}
+    {% if products %}
+      {% for product in products %}
         <div class="col-md-4 mb-4">
           <div class="card h-100">
 
-            <!-- 🔹 Mostrar portada (subida o imagen por defecto) -->
-            {% if book.cover_filename %}
-              <img src="{{ url_for('static', filename='uploads/' + book.cover_filename) }}"
-                   alt="{{ book.title }}"
+            <!-- 🔹 Mostrar foto de la prenda (subida o imagen por defecto) -->
+            {% if product.image_filename %}
+              <img src="{{ url_for('static', filename='uploads/' + product.image_filename) }}"
+                   alt="{{ product.name }}"
                    style="width: 100%; height: 300px; object-fit: contain; background-color: #f8f9fa; border-radius: 8px;">
             {% else %}
-              <img src="{{ url_for('static', filename='no_cover.png') }}"
-                   alt="Sin portada"
+              <img src="{{ url_for('static', filename='no_image.png') }}"
+                   alt="Sin imagen"
                    style="width: 100%; height: 300px; object-fit: contain; background-color: #f8f9fa; border-radius: 8px;">
             {% endif %}
 
             <div class="card-body d-flex flex-column">
 
-              <h5 class="card-title">{{ book.title }}</h5>
-              <p class="card-text mb-1">Autor: {{ book.author }}</p>
-              {% if book.description %}
-                <p class="card-text small text-muted mb-1" style="min-height:2em;max-height:4em;overflow:auto;">{{ book.description }}</p>
+              <h5 class="card-title">{{ product.name }}</h5>
+              <p class="card-text mb-1">Marca: {{ product.brand }}</p>
+              {% if product.description %}
+                <p class="card-text small text-muted mb-1" style="min-height:2em;max-height:4em;overflow:auto;">{{ product.description }}</p>
               {% endif %}
-              <p class="card-text">Stock: {{ book.stock }}</p>
-              <p class="card-text"><strong>${{ "%.2f"|format(book.price) }}</strong></p>
+              <p class="card-text">Stock: {{ product.stock }}</p>
+              <p class="card-text"><strong>${{ "%.2f"|format(product.price) }}</strong></p>
 
               <div class="mt-auto d-flex gap-2">
                 <!-- Botón para añadir uno al carrito -->
-                <a class="btn btn-sm btn-success" href="{{ url_for('add_to_cart', book_id=book.id, quantity=1) }}">
+                <a class="btn btn-sm btn-success" href="{{ url_for('add_to_cart', product_id=product.id, quantity=1) }}">
                   <i class="bi bi-cart-plus"></i> Añadir (1)
                 </a>
 
                 <!-- Formulario para elegir cantidad -->
-                <form action="{{ url_for('add_to_cart', book_id=book.id) }}" method="POST" class="d-flex">
+                <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="d-flex">
                   <!-- CSRF token required by Flask-WTF CSRFProtect -->
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <input type="number" name="quantity" value="1" min="-5" max="200" class="form-control form-control-sm me-1" style="width:80px">
@@ -145,7 +145,7 @@
         </div>
       {% endfor %}
     {% else %}
-      <p class="text-muted">No se encontraron libros con esa búsqueda.</p>
+      <p class="text-muted">No se encontraron prendas con esa búsqueda.</p>
     {% endif %}
   </div>
 </div>

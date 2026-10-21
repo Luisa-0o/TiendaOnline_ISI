@@ -9,7 +9,7 @@
     <thead class="table-dark text-center">
       <tr>
         <th>Imagen</th>
-        <th>Libro</th>
+        <th>Producto</th>
         <th>Precio</th>
         <th>Cantidad</th>
         <th>Subtotal</th>
@@ -20,21 +20,21 @@
       {% for item in items %}
       <tr class="text-center">
         <td>
-          {% if item.book.cover_filename %}
-            <img src="{{ url_for('static', filename='uploads/' ~ item.book.cover_filename) }}" 
-                 alt="{{ item.book.title }}" class="img-thumbnail" 
+          {% if item.product.image_filename %}
+            <img src="{{ url_for('static', filename='uploads/' ~ item.product.image_filename) }}" 
+                 alt="{{ item.product.name }}" class="img-thumbnail" 
                  style="width: 80px; height: 100px; object-fit: cover;">
           {% else %}
             <img src="{{ url_for('static', filename='no_image.png') }}" 
-                 alt="Sin foro" class="img-thumbnail" 
+                 alt="Sin imagen" class="img-thumbnail" 
                  style="width: 80px; height: 100px;">
           {% endif %}
         </td>
         <td class="text-start">
-          <strong>{{ item.book.title }}</strong><br>
-          <small class="text-muted">Autor: {{ item.book.author }}</small>
+          <strong>{{ item.product.name }}</strong><br>
+          <small class="text-muted">Marca: {{ item.product.brand }}</small>
         </td>
-        <td>${{ "%.2f"|format(item.book.price or 0) }}</td>
+        <td>${{ "%.2f"|format(item.product.price or 0) }}</td>
         <td>{{ item.quantity }}</td>
         <td>${{ "%.2f"|format(item.line_total()) }}</td>
         <td>

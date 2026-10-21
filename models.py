@@ -39,30 +39,30 @@ class User(UserMixin, db.Model):
 
 
 
-# MODELO DE LIBRO
+# MODELO DE PRODUCTO (PRENDA)
 
 
-class Book(db.Model):
-    __tablename__ = 'books'
+class Product(db.Model):
+    __tablename__ = 'products'
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(120), nullable=False)
-    author = db.Column(db.String(120), nullable=False)
+    name = db.Column(db.String(120), nullable=False)      # nombre de la prenda
+    brand = db.Column(db.String(120), nullable=False)     # marca de la prenda
     price = db.Column(db.Float, nullable=False)
     stock = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text)
-    # Categoría del libro (opcional)
+    # Categoría de la prenda: Camisas, Pantalones, Zapatos, Accesorios, etc. (opcional)
     category = db.Column(db.String(50))
-    cover_filename = db.Column(db.String(255))  # nombre de archivo de la portada
+    image_filename = db.Column(db.String(255))  # nombre de archivo de la foto de la prenda
 
     def image_url(self):
         """Devuelve la URL de la imagen o una por defecto"""
-        if self.cover_filename:
-            return url_for('static', filename=f'uploads/{self.cover_filename}')
-        return url_for('static', filename='no_cover.png')
+        if self.image_filename:
+            return url_for('static', filename=f'uploads/{self.image_filename}')
+        return url_for('static', filename='no_image.png')
 
     def __repr__(self):
-        return f'<Book {self.title}>'
+        return f'<Product {self.name}>'
 
 
 
@@ -88,18 +88,18 @@ class CartItem(db.Model):
     __tablename__ = 'cart_items'
     id = db.Column(db.Integer, primary_key=True)
     cart_id = db.Column(db.Integer, db.ForeignKey('carts.id'), nullable=False)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=1)
 
     cart = db.relationship('Cart', backref=db.backref('items', cascade='all, delete-orphan'))
-    book = db.relationship('Book')
+    product = db.relationship('Product')
 
     def line_total(self):
         """Subtotal del ítem"""
-        return (self.book.price or 0) * (self.quantity or 0)
+        return (self.product.price or 0) * (self.quantity or 0)
 
     def __repr__(self):
-        return f'<CartItem book_id={self.book_id} qty={self.quantity}>'
+        return f'<CartItem product_id={self.product_id} qty={self.quantity}>'
 
 
 
@@ -124,16 +124,16 @@ class OrderItem(db.Model):
     __tablename__ = 'order_items'
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=1)
     price = db.Column(db.Float, nullable=False)  # precio unitario en el momento del pedido
 
     order = db.relationship('Order', backref=db.backref('items', cascade='all, delete-orphan'))
-    book = db.relationship('Book')
+    product = db.relationship('Product')
 
     def line_total(self):
         """Subtotal del ítem del pedido"""
         return (self.price or 0) * (self.quantity or 0)
 
     def __repr__(self):
-        return f'<OrderItem book_id={self.book_id} qty={self.quantity} price={self.price}>'
+        return f'<OrderItem product_id={self.product_id} qty={self.quantity} price={self.price}>'

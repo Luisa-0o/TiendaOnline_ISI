@@ -83,7 +83,7 @@
 
 <!-- Mostrar/ocultar campos de tarjeta -->
 <script>
-document.querySelectorAll('input[name="payment_method"]').forof(el => {
+document.querySelectorAll('input[name="payment_method"]').forEach(el => {
   el.addEventListener('change', e => {
     const cardSection = document.getElementById('card-info');
     if (e.target.value === 'Visa' || e.target.value === 'MasterCard') {

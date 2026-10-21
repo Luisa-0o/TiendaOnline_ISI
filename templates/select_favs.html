@@ -33,9 +33,9 @@
   </form>
 
   <script>
-    // Forzar seleccionar máximo 2 opcines
+    // Forzar seleccionar máximo 2 opciones
     const checkboxes = document.querySelectorAll('.fav-checkbox');
-    checkboxes.forof(cb => cb.addEventListener('change', (event) => {
+    checkboxes.forEach(cb => cb.addEventListener('change', (event) => {
       const checked = Array.from(checkboxes).filter(c => c.checked);
       if (checked.length > 2) {
         // desmarcar la última seleccionada

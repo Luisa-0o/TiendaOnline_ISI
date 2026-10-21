@@ -113,30 +113,30 @@ User ──── Cart
 
 ---
 
-## 📖 Book (Libros)
+## 👕 Product (Productos)
 
-**Tabla**: `books`  
-**Descripción**: Catálogo de libros disponibles para compra
+**Tabla**: `products`  
+**Descripción**: Catálogo de productos disponibles para compra
 
 ### Campos
 
 | Campo | Tipo | Restricciones | Descripción |
 |-------|------|---|---|
 | `id` | Integer | PRIMARY KEY, AUTOINCREMENT | Identificador único |
-| `title` | String(120) | NOT NULL | Título del libro |
-| `author` | String(120) | NOT NULL | Nombre del autor |
+| `name` | String(120) | NOT NULL | Nombre de la prenda |
+| `brand` | String(120) | NOT NULL | Marca de la prenda |
 | `price` | Float | NOT NULL | Precio de venta |
 | `stock` | Integer | NOT NULL | Cantidad disponible |
-| `description` | Text | NULLABLE | Descripción/sinopsis del libro |
+| `description` | Text | NULLABLE | Descripción de la prenda |
 | `category` | String(50) | NULLABLE | Categoría (para filtros y recomendaciones) |
-| `cover_filename` | String(255) | NULLABLE | Nombre del archivo de portada en `static/uploads/` |
+| `image_filename` | String(255) | NULLABLE | Nombre del archivo de imagen en `static/uploads/` |
 
 ### Validaciones
 
 - **price**: Debe ser ≥ 0
 - **stock**: Debe ser ≥ 0 (entero)
-- **title**: Máximo 120 caracteres
-- **author**: Máximo 120 caracteres
+- **name**: Máximo 120 caracteres
+- **brand**: Máximo 120 caracteres
 
 ### Métodos Python
 
@@ -144,49 +144,49 @@ User ──── Cart
 ```python
 def image_url(self):
     """Retorna la URL de la imagen o una por defecto"""
-    if self.cover_filename:
-        return url_for('static', filename=f'uploads/{self.cover_filename}')
-    return url_for('static', filename='no_cover.png')
+    if self.image_filename:
+        return url_for('static', filename=f'uploads/{self.image_filename}')
+    return url_for('static', filename='no_image.png')
 ```
-- Retorna: URL de portada o imagen por defecto
-- Uso: En templates para mostrar portada
+- Retorna: URL de imagen o imagen por defecto
+- Uso: En templates para mostrar imagen
 
 ### Relaciones
 
 #### `cartitems` (Relación 1:N)
 ```
-Book ──── CartItem
+Product ──── CartItem
 (1)        (N)
 ```
-- Un libro puede estar en múltiples carritos
-- Acceso: `book.cartitems`
+- Un producto puede estar en múltiples carritos
+- Acceso: `product.cartitems`
 
 #### `orderitems` (Relación 1:N)
 ```
-Book ──── OrderItem
+Product ──── OrderItem
 (1)        (N)
 ```
-- Un libro puede estar en múltiples pedidos
-- Acceso: `book.orderitems`
+- Un producto puede estar en múltiples pedidos
+- Acceso: `product.orderitems`
 
 ### Restricciones de Negocio
 
 1. **No se puede eliminar si tiene pedidos**
    ```python
-   if OrderItem.query.filter_by(book_id=book.id).first():
-       flash("No puedes eliminar este libro porque tiene pedidos.")
+   if OrderItem.query.filter_by(product_id=product.id).first():
+       flash("No puedes eliminar este producto porque tiene pedidos.")
    ```
 
 2. **Stock se reduce al crear Order**
    ```python
    for item in cart.items:
-       item.book.stock -= item.quantity
+       item.product.stock -= item.quantity
    ```
 
 3. **Stock se restaura al cancelar Order**
    ```python
    for item in order.items:
-       item.book.stock += item.quantity
+       item.product.stock += item.quantity
    ```
 
 ### Ciclo de Vida
@@ -194,7 +194,7 @@ Book ──── OrderItem
 ```
 [Crear en admin] → [Validar datos]
     ↓
-[Guardar portada (opcional)]
+[Guardar imagen (opcional)]
     ↓
 [Guardar en BD]
     ↓
@@ -283,14 +283,14 @@ items = db.backref('cart', cascade='all, delete-orphan')
 |-------|------|---|---|
 | `id` | Integer | PRIMARY KEY, AUTOINCREMENT | Identificador único |
 | `cart_id` | Integer | FK(carts.id), NOT NULL | Carrito propietario |
-| `book_id` | Integer | FK(books.id), NOT NULL | Libro en el carrito |
+| `product_id` | Integer | FK(products.id), NOT NULL | Producto en el carrito |
 | `quantity` | Integer | NOT NULL, DEFAULT 1 | Cantidad del producto |
 
 ### Foreign Keys
 
 ```
 cart_items.cart_id → carts.id (ON DELETE CASCADE)
-cart_items.book_id → books.id (ON DELETE CASCADE)
+cart_items.product_id → products.id (ON DELETE CASCADE)
 ```
 
 ### Relaciones
@@ -301,12 +301,12 @@ cart = db.relationship('Cart', backref=db.backref('items', cascade='all, delete-
 ```
 - Acceso: `item.cart` o `cart.items`
 
-#### `book` (Relación 1:N inversa)
+#### `product` (Relación 1:N inversa)
 ```python
-book = db.relationship('Book')
+product = db.relationship('Product')
 ```
-- Acceso: `item.book`
-- Contiene todos los datos del libro
+- Acceso: `item.product`
+- Contiene todos los datos del producto
 
 ### Métodos Python
 
@@ -314,7 +314,7 @@ book = db.relationship('Book')
 ```python
 def line_total(self):
     """Calcula el subtotal del item (cantidad × precio)"""
-    return (self.book.price or 0) * (self.quantity or 0)
+    return (self.product.price or 0) * (self.quantity or 0)
 ```
 - Retorna: `quantity × price`
 - Uso: Cálculo de totales en carrito
@@ -323,7 +323,7 @@ def line_total(self):
 
 ```python
 # Agregar producto al carrito
-item = CartItem(cart_id=cart.id, book_id=book.id, quantity=2)
+item = CartItem(cart_id=cart.id, product_id=product.id, quantity=2)
 db.session.add(item)
 
 # Obtener subtotal
@@ -408,7 +408,7 @@ items = db.backref('order', cascade='all, delete-orphan')
     ↓
 [Para cada CartItem]
 ├─ Crear OrderItem (copia)
-├─ Reducir stock del libro
+├─ Reducir stock del producto
 └─ Sumar al total
     ↓
 [Guardar Order.total]
@@ -439,12 +439,12 @@ db.session.flush()  # Para obtener order.id
 for item in cart.items:
     order_item = OrderItem(
         order_id=order.id,
-        book_id=item.book_id,
+        product_id=item.product_id,
         quantity=item.quantity,
-        price=item.book.price
+        price=item.product.price
     )
     db.session.add(order_item)
-    order.total += item.quantity * item.book.price
+    order.total += item.quantity * item.product.price
 
 # Cambiar estado
 order.status = 'paid'
@@ -464,7 +464,7 @@ db.session.commit()
 |-------|------|---|---|
 | `id` | Integer | PRIMARY KEY, AUTOINCREMENT | Identificador único |
 | `order_id` | Integer | FK(orders.id), NOT NULL | Pedido propietario |
-| `book_id` | Integer | FK(books.id), NOT NULL | Libro comprado |
+| `product_id` | Integer | FK(products.id), NOT NULL | Producto comprado |
 | `quantity` | Integer | NOT NULL, DEFAULT 1 | Cantidad comprada |
 | `price` | Float | NOT NULL | Precio unitario en momento de la compra |
 
@@ -472,7 +472,7 @@ db.session.commit()
 
 ```
 order_items.order_id → orders.id (ON DELETE CASCADE)
-order_items.book_id → books.id (ON DELETE CASCADE)
+order_items.product_id → products.id (ON DELETE CASCADE)
 ```
 
 ### Relaciones
@@ -483,11 +483,11 @@ order = db.relationship('Order', backref=db.backref('items', cascade='all, delet
 ```
 - Acceso: `item.order` o `order.items`
 
-#### `book` (Relación N:1)
+#### `product` (Relación N:1)
 ```python
-book = db.relationship('Book')
+product = db.relationship('Product')
 ```
-- Acceso: `item.book`
+- Acceso: `item.product`
 - Nota: Solo lectura, no se modifica
 
 ### Métodos Python
@@ -499,7 +499,7 @@ def line_total(self):
     return (self.price or 0) * (self.quantity or 0)
 ```
 - Retorna: `quantity × price`
-- Nota: Usa `price` (no `book.price`), para historicidad
+- Nota: Usa `price` (no `product.price`), para historicidad
 
 ### Importancia de Guardar Precio
 
@@ -507,13 +507,13 @@ def line_total(self):
 # ✅ CORRECTO: Guardar precio en momento de compra
 order_item = OrderItem(
     order_id=order.id,
-    book_id=book.id,
+    product_id=product.id,
     quantity=item.quantity,
-    price=item.book.price  # Precio en ese momento
+    price=item.product.price  # Precio en ese momento
 )
 
 # ❌ INCORRECTO: Usar precio actual
-# Si el libro cambia de precio después:
+# Si el producto cambia de precio después:
 # El pedido antiguo tendría precio nuevo (incorrecto)
 ```
 
@@ -523,7 +523,7 @@ order_item = OrderItem(
 # Crear item de pedido
 order_item = OrderItem(
     order_id=123,
-    book_id=5,
+    product_id=5,
     quantity=2,
     price=19.99
 )
@@ -532,7 +532,7 @@ order_item = OrderItem(
 subtotal = order_item.line_total()  # 2 × 19.99 = 39.98
 
 # Ver detalles
-print(order_item.book.title)  # Título del libro
+print(order_item.product.name)  # Nombre de la prenda
 print(order_item.price)        # Precio pagado
 print(order_item.quantity)     # Cantidad
 ```
@@ -572,22 +572,22 @@ print(order_item.quantity)     # Cantidad
         ├──────────────┤    │
         │ id (PK)      │    │
         │ cart_id (FK) ├────┼──→ (Can be deleted)
-        │ book_id (FK) │    │
+        │ product_id (FK) │    │
         │ quantity     │    │
         └──────────────┘    │
              │              │
              │ FK           │
              ▼              │
         ┌─────────────┐     │
-        │   Book      │     │
+        │   Product   │     │
         ├─────────────┤     │
         │ id (PK)     │     │
-        │ title       │     │
-        │ author      │     │
+        │ name        │     │
+        │ brand       │     │
         │ price       │     │
         │ stock       │     │
         │ category    │     │
-        │ cover       │     │
+        │ image       │     │
         └─────────────┘     │
              ▲              │
              │              │
@@ -598,7 +598,7 @@ print(order_item.quantity)     # Cantidad
         ├──────────────┤    │
         │ id (PK)      │    │
         │ order_id(FK) │    │
-        │ book_id (FK) │    │
+        │ product_id (FK) │    │
         │ quantity     │    │
         │ price        │    │
         └──────────────┘    │
@@ -632,15 +632,15 @@ CREATE TABLE users (
     fav_category2 VARCHAR(50)
 );
 
-CREATE TABLE books (
+CREATE TABLE products (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(120) NOT NULL,
-    author VARCHAR(120) NOT NULL,
+    name VARCHAR(120) NOT NULL,
+    brand VARCHAR(120) NOT NULL,
     price FLOAT NOT NULL,
     stock INTEGER NOT NULL,
     description TEXT,
     category VARCHAR(50),
-    cover_filename VARCHAR(255)
+    image_filename VARCHAR(255)
 );
 
 CREATE TABLE carts (
@@ -653,10 +653,10 @@ CREATE TABLE carts (
 CREATE TABLE cart_items (
     id SERIAL PRIMARY KEY,
     cart_id INTEGER NOT NULL,
-    book_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
-    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
 CREATE TABLE orders (
@@ -671,11 +671,11 @@ CREATE TABLE orders (
 CREATE TABLE order_items (
     id SERIAL PRIMARY KEY,
     order_id INTEGER NOT NULL,
-    book_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 1,
     price FLOAT NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 ```
 
@@ -694,7 +694,7 @@ cart = current_user.cart
 ```python
 items = cart.items
 for item in items:
-    print(f"{item.book.title}: {item.quantity} × ${item.book.price}")
+    print(f"{item.product.name}: {item.quantity} × ${item.product.price}")
 ```
 
 ### Obtener total del carrito
@@ -711,7 +711,7 @@ orders = Order.query.filter_by(user_id=user.id).order_by(Order.id.desc()).all()
 ```python
 items = order.items
 for item in items:
-    print(f"{item.book.title}: {item.quantity} × ${item.price}")
+    print(f"{item.product.name}: {item.quantity} × ${item.price}")
 ```
 
 ### Calcular total de pedido
@@ -726,9 +726,9 @@ total = order.total
 paid_orders = Order.query.filter_by(status='paid').all()
 ```
 
-### Obtener libros en una categoría
+### Obtener productos en una categoría
 ```python
-fiction_books = Book.query.filter_by(category='Ficción').all()
+fiction_products = Product.query.filter_by(category='Ficción').all()
 ```
 
 ### Cambiar estado de pedido
@@ -740,7 +740,7 @@ db.session.commit()
 ### Cancelar pedido (restaurar stock)
 ```python
 for item in order.items:
-    item.book.stock += item.quantity
+    item.product.stock += item.quantity
 order.status = 'cancelled'
 db.session.commit()
 ```
@@ -764,17 +764,17 @@ total_orders = Order.query.count()
 total_users = User.query.count()
 ```
 
-### Total de libros vendidos
+### Total de productos vendidos
 ```python
 total_sold = db.session.query(func.sum(OrderItem.quantity)).scalar()
 ```
 
-### Libro más vendido
+### Producto más vendido
 ```python
 most_sold = db.session.query(
-    Book.title,
+    Product.name,
     func.sum(OrderItem.quantity).label('total_sold')
-).join(OrderItem).group_by(Book.id).order_by('total_sold').first()
+).join(OrderItem).group_by(Product.id).order_by('total_sold').first()
 ```
 
 ---

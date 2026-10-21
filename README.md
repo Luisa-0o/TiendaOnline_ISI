@@ -1,8 +1,8 @@
-# 📚 Sistema de Tienda Online de Libros
+# 👗 Névora Moda! – Sistema de Tienda Online de Ropa
 
-**Aplicación web para compra y venta de libros** desarrollada con Flask, SQLAlchemy y Bootstrap. Incluye autenticación de usuarios, carrito de compras, procesamiento de pagos y panel administrativo completo.
+**Aplicación web para compra y venta de productos** desarrollada con Flask, SQLAlchemy y Bootstrap. Incluye autenticación de usuarios, carrito de compras, procesamiento de pagos y panel administrativo completo.
 
-> **Repositorio**: [Luisa-0o/ProyectoFlask_POO1](https://github.com/Luisa-0o/ProyectoFlask_POO1)
+> **Repositorio**: [Luisa-0o/TiendaOnline_ISI](https://github.com/Luisa-0o/TiendaOnline_ISI)
 
 ---
 
@@ -15,8 +15,8 @@
 - Cambio de contraseña
 
 ✅ **Catálogo Dinámico**
-- Listado completo de libros
-- Búsqueda por título y autor
+- Listado completo de productos
+- Búsqueda por nombre y marca
 - Filtrado por categorías
 - Recomendaciones personalizadas basadas en categorías favoritas
 
@@ -44,7 +44,7 @@
 - Diseño profesional
 
 ✅ **Panel Administrativo**
-- Gestión completa de libros (CRUD)
+- Gestión completa de productos (CRUD)
 - Gestión de usuarios
 - Visualización y actualización de pedidos de clientes
 - Control de permisos y roles
@@ -84,8 +84,8 @@
 ### 1️⃣ Clonar el Repositorio
 
 ```bash
-git clone https://github.com/Luisa-0o/ProyectoFlask_POO1.git
-cd New_Repo_Flask
+git clone https://github.com/Luisa-0o/TiendaOnline_ISI.git
+cd TiendaOnline_ISI
 ```
 
 ### 2️⃣ Crear Entorno Virtual
@@ -134,7 +134,7 @@ FLASK_ENV=development
 
 **Nota**: Para producción, usar PostgreSQL:
 ```
-DATABASE_URL=postgresql://usuario:password@localhost:5432/bookstore
+DATABASE_URL=postgresql://usuario:password@localhost:5432/nevora_moda
 ```
 
 ### 5️⃣ Inicializar Base de Datos
@@ -151,6 +151,17 @@ flask db upgrade
 flask db upgrade
 ```
 
+### 5️⃣➕ (Opcional) Cargar prendas de ejemplo
+
+Para tener un catálogo de ropa listo para probar (camisas, pantalones, zapatos, accesorios, vestidos y chaquetas):
+
+```bash
+python seed_products.py
+```
+
+> Si ya tenías una base de datos de la versión anterior (tienda de libros), `flask db upgrade`
+> renombra automáticamente la tabla `books` a `products` y sus columnas.
+
 ### 6️⃣ Ejecutar la Aplicación
 
 ```bash
@@ -164,11 +175,12 @@ La aplicación estará disponible en: **http://localhost:5000**
 ## 📁 Estructura del Proyecto
 
 ```
-New_Repo_Flask/
+TiendaOnline_ISI/
 ├── app.py                          # Aplicación principal (rutas y lógica)
 ├── models.py                       # Modelos de base de datos
 ├── forms.py                        # Formularios WTForms
 ├── config.py                       # Configuración de la app
+├── seed_products.py                # Prendas de ejemplo para el catálogo
 ├── requirements.txt                # Dependencias de Python
 ├── db.sqlite3                      # Base de datos (desarrollo)
 ├── README.md                       # Este archivo
@@ -183,14 +195,14 @@ New_Repo_Flask/
 │
 ├── static/                         # Archivos estáticos
 │   ├── style.css                  # Estilos CSS personalizados
-│   └── uploads/                   # Portadas de libros (subidas)
+│   └── uploads/                   # Imágenes de productos (subidas)
 │
 ├── templates/                      # Plantillas HTML
 │   ├── base.html                  # Plantilla base (navbar, footer)
 │   ├── login.html                 # Página de login
 │   ├── register.html              # Página de registro
 │   ├── profile.html               # Perfil del usuario
-│   ├── catalogo.html              # Catálogo de libros
+│   ├── catalogo.html              # Catálogo de productos
 │   ├── select_favs.html           # Seleccionar categorías favoritas
 │   ├── cart.html                  # Carrito de compras
 │   ├── checkout.html              # Confirmación de compra
@@ -200,11 +212,11 @@ New_Repo_Flask/
 │   ├── invoice.html               # Factura (imprimible)
 │   ├── change_password.html       # Cambiar contraseña
 │   ├── admin.html                 # Panel admin principal
-│   ├── admin_books.html           # Gestión de libros (admin)
+│   ├── admin_products.html           # Gestión de productos (admin)
 │   ├── admin_users.html           # Gestión de usuarios (admin)
 │   ├── admin_orders.html          # Gestión de pedidos (admin)
-│   ├── create_book.html           # Crear libro (admin)
-│   ├── edit_book.html             # Editar libro (admin)
+│   ├── create_product.html           # Crear producto (admin)
+│   ├── edit_product.html             # Editar producto (admin)
 │   ├── add_user.html              # Agregar usuario (admin)
 │   └── edit_user.html             # Editar usuario (admin)
 │
@@ -216,11 +228,11 @@ New_Repo_Flask/
 ## 👥 Tipos de Usuario y Roles
 
 ### 👤 Usuario Normal
-- Navegar por el catálogo de libros
-- Buscar libros por título/autor
+- Navegar por el catálogo de productos
+- Buscar productos por nombre/marca
 - Filtrar por categorías
 - Seleccionar 2 categorías favoritas (recomendaciones personalizadas)
-- Agregar/remover libros del carrito
+- Agregar/remover productos del carrito
 - Realizar compras
 - Ver historial de pedidos
 - Descargar/imprimir facturas
@@ -229,7 +241,7 @@ New_Repo_Flask/
 
 ### 🔐 Administrador
 - Acceso completo al panel administrativo
-- **Gestión de Libros**: Crear, editar, eliminar
+- **Gestión de Productos**: Crear, editar, eliminar
 - **Gestión de Usuarios**: Crear, editar, eliminar
 - **Gestión de Pedidos**: Ver estado, actualizar estado (created → paid → shipped → delivered → cancelled)
 - **Visualización de reportes** de pedidos de clientes
@@ -251,16 +263,16 @@ New_Repo_Flask/
 - fav_category2: Segunda categoría favorita (opcional)
 ```
 
-### 📖 Book (Libros)
+### 👕 Product (Productos)
 ```
 - id: Identificador único
-- title: Título del libro
-- author: Autor del libro
+- name: Nombre de la prenda
+- brand: Marca de la prenda
 - price: Precio unitario
 - stock: Cantidad disponible
-- description: Descripción del libro
-- category: Categoría del libro
-- cover_filename: Nombre del archivo de portada
+- description: Descripción del producto
+- category: Categoría del producto
+- image_filename: Nombre del archivo de imagen
 ```
 
 ### 🛒 Cart (Carrito)
@@ -275,7 +287,7 @@ New_Repo_Flask/
 ```
 - id: Identificador único
 - cart_id: Carrito propietario
-- book_id: Libro en el carrito
+- product_id: Producto en el carrito
 - quantity: Cantidad del producto
 ```
 
@@ -292,7 +304,7 @@ New_Repo_Flask/
 ```
 - id: Identificador único
 - order_id: Pedido propietario
-- book_id: Libro comprado
+- product_id: Producto comprado
 - quantity: Cantidad comprada
 - price: Precio en el momento de la compra
 ```
@@ -314,11 +326,11 @@ New_Repo_Flask/
 └─────────────────────────────────────────────────┘
                        ↓
 ┌─────────────────────────────────────────────────┐
-│         USUARIO COMPRA UN LIBRO                 │
+│         USUARIO COMPRA UN PRODUCTO (PRENDA)                 │
 ├─────────────────────────────────────────────────┤
 │  1. Navega /catalogo (ve recomendaciones)       │
-│  2. Busca/filtra libros                         │
-│  3. Hace click en libro                         │
+│  2. Busca/filtra productos                         │
+│  3. Hace click en producto                         │
 │  4. Selecciona cantidad                         │
 │  5. "Agregar al carrito" → /cart/add/<id>      │
 │  6. Va a /cart (revisa carrito)                 │
@@ -337,7 +349,7 @@ New_Repo_Flask/
 │         ADMIN GESTIONA TIENDA                   │
 ├─────────────────────────────────────────────────┤
 │  1. Accede a /admin                             │
-│  2. /admin/books → CRUD de libros               │
+│  2. /admin/products → CRUD de productos               │
 │  3. /admin/users → Gestión de usuarios          │
 │  4. /admin/orders → Seguimiento de pedidos      │
 │  5. Puede actualizar estado de órdenes          │
@@ -391,14 +403,14 @@ New_Repo_Flask/
 ### Catálogo
 | Ruta | Método | Descripción |
 |------|--------|-------------|
-| `/catalogo` | GET | Ver catálogo de libros |
+| `/catalogo` | GET | Ver catálogo de productos |
 | `/select-favs` | GET, POST | Seleccionar categorías favoritas |
 
 ### Carrito y Compras
 | Ruta | Método | Descripción |
 |------|--------|-------------|
 | `/cart` | GET | Ver carrito |
-| `/cart/add/<book_id>` | GET, POST | Agregar al carrito |
+| `/cart/add/<product_id>` | GET, POST | Agregar al carrito |
 | `/cart/remove/<item_id>` | POST | Remover del carrito |
 | `/checkout` | GET, POST | Crear pedido |
 | `/payment` | GET, POST | Procesar pago |
@@ -415,10 +427,10 @@ New_Repo_Flask/
 | Ruta | Método | Descripción |
 |------|--------|-------------|
 | `/admin` | GET | Dashboard admin |
-| `/admin/books` | GET | Listar libros |
-| `/admin/books/create` | GET, POST | Crear libro |
-| `/admin/books/edit/<id>` | GET, POST | Editar libro |
-| `/admin/books/delete/<id>` | POST | Eliminar libro |
+| `/admin/products` | GET | Listar productos |
+| `/admin/products/create` | GET, POST | Crear producto |
+| `/admin/products/edit/<id>` | GET, POST | Editar producto |
+| `/admin/products/delete/<id>` | POST | Eliminar producto |
 | `/admin/users` | GET | Listar usuarios |
 | `/admin/users/add` | GET, POST | Agregar usuario |
 | `/admin/users/edit/<id>` | GET, POST | Editar usuario |
@@ -446,14 +458,14 @@ New_Repo_Flask/
 - Nueva contraseña
 - Confirmar nueva contraseña
 
-### BookForm
-- Título
-- Autor
+### ProductForm
+- Nombre
+- Marca
 - Categoría
 - Precio
 - Stock
 - Descripción
-- Portada (imagen opcional)
+- Imagen (imagen opcional)
 
 ---
 
@@ -486,8 +498,8 @@ heroku logs --tail
 sudo apt-get install python3 python3-pip postgresql
 
 # Clonar repositorio
-git clone https://github.com/Luisa-0o/ProyectoFlask_POO1.git
-cd New_Repo_Flask
+git clone https://github.com/Luisa-0o/TiendaOnline_ISI.git
+cd TiendaOnline_ISI
 
 # Crear entorno virtual
 python3 -m venv venv
@@ -523,7 +535,7 @@ server {
     }
 
     location /static {
-        alias /home/usuario/New_Repo_Flask/static;
+        alias /home/usuario/TiendaOnline_ISI/static;
     }
 }
 ```
@@ -594,9 +606,9 @@ mkdir -p static/uploads
 
 ## 📧 Contacto
 
-- **Autor**: Luisa Builes
+- **Marca**: Luisa Builes
 - **GitHub**: [@Luisa-0o](https://github.com/Luisa-0o)
-- **Repositorio**: [ProyectoFlask_POO1](https://github.com/Luisa-0o/ProyectoFlask_POO1)
+- **Repositorio**: [TiendaOnline_ISI](https://github.com/Luisa-0o/TiendaOnline_ISI)
 
 ---
 

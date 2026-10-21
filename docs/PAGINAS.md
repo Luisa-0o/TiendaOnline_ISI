@@ -161,7 +161,7 @@ Permite que usuarios cambien su contraseña.
 Los usuarios normales seleccionan 2 categorías favoritas para recibir recomendaciones personalizadas.
 
 ### Funcionamiento
-1. Obtiene todas las categorías de libros existentes
+1. Obtiene todas las categorías de productos existentes
 2. Si usuario es admin → Redirige a `/admin`
 3. Muestra checkboxes para cada categoría
 
@@ -179,48 +179,48 @@ Los usuarios normales seleccionan 2 categorías favoritas para recibir recomenda
 
 ### Uso de Favoritas
 - Se usan en `/catalogo` para mostrar recomendaciones
-- Filtro: `Book.category.in_([fav1, fav2])`
-- Se muestran hasta 8 libros recomendados
+- Filtro: `Product.category.in_([fav1, fav2])`
+- Se muestran hasta 8 productos recomendados
 
 ---
 
-## 📚 Catálogo (`/catalogo`)
+## 👗 Catálogo (`/catalogo`)
 
 **Acceso**: Autenticado  
 **Método**: GET  
 **Template**: `catalogo.html`
 
 ### Descripción
-Muestra el catálogo completo de libros disponibles con búsqueda, filtros y recomendaciones.
+Muestra el catálogo completo de productos disponibles con búsqueda, filtros y recomendaciones.
 
 ### Parámetros de URL
 | Parámetro | Tipo | Descripción | Ejemplo |
 |-----------|------|-------------|---------|
-| `q` | string | Búsqueda por título o autor | `?q=harry+potter` |
+| `q` | string | Búsqueda por nombre o marca | `?q=camisa` |
 | `category` | string | Filtro por categoría | `?category=Ficción` |
 
 ### Ejemplos de Búsqueda
-- `/catalogo` → Todos los libros
-- `/catalogo?q=rowling` → Busca por autor
+- `/catalogo` → Todos los productos
+- `/catalogo?q=rowling` → Busca por marca
 - `/catalogo?category=Ficción` → Solo ficción
 - `/catalogo?q=potter&category=Ficción` → Búsqueda + filtro
 
 ### Búsqueda en BD
 ```python
-books_q = Book.query
+products_q = Product.query
 if query:
-    books_q = books_q.filter(
-        (Book.title.ilike(f'%{query}%')) |
-        (Book.author.ilike(f'%{query}%'))
+    products_q = products_q.filter(
+        (Product.name.ilike(f'%{query}%')) |
+        (Product.brand.ilike(f'%{query}%'))
     )
 if selected_category:
-    books_q = books_q.filter(Book.category == selected_category)
+    products_q = products_q.filter(Product.category == selected_category)
 ```
 
-### Información Mostrada por Libro
-- Portada (imagen)
-- Título
-- Autor
+### Información Mostrada por Producto
+- Imagen (imagen)
+- Nombre
+- Marca
 - Precio
 - Categoría
 - Descripción (truncada)
@@ -229,7 +229,7 @@ if selected_category:
 ### Recomendaciones Personalizadas
 - Solo para usuarios normales (no admins)
 - Basadas en `fav_category1` y `fav_category2`
-- Muestra hasta 8 libros
+- Muestra hasta 8 productos
 - Se ordena por ID descendente (más recientes)
 
 ### Lista de Categorías
@@ -258,9 +258,9 @@ Muestra el carrito de compras del usuario actual.
 #### Por cada item:
 | Dato | Descripción |
 |------|-------------|
-| Portada | Imagen del libro |
-| Título | Nombre del libro |
-| Autor | Autor del libro |
+| Imagen | Imagen del producto |
+| Nombre | Nombre del producto |
+| Marca | Marca de la prenda |
 | Precio Unitario | Precio de venta |
 | Cantidad | Cantidad en carrito |
 | Subtotal | cantidad × precio |
@@ -281,19 +281,19 @@ Muestra el carrito de compras del usuario actual.
 
 ---
 
-## ➕ Agregar al Carrito (`/cart/add/<book_id>`)
+## ➕ Agregar al Carrito (`/cart/add/<product_id>`)
 
 **Acceso**: Autenticado  
 **Método**: GET o POST  
 **Parámetros**:
-- `book_id` (requerido): ID del libro
+- `product_id` (requerido): ID del producto
 - `quantity` (opcional): Cantidad (default: 1)
 
 ### Descripción
 Agrega un producto al carrito del usuario.
 
 ### Lógica
-1. Obtiene libro por ID
+1. Obtiene producto por ID
 2. Valida cantidad (debe ser > 0)
 3. Valida stock disponible
 4. Obtiene/crea carrito del usuario
@@ -307,15 +307,15 @@ Agrega un producto al carrito del usuario.
 if qty <= 0:
     flash('Cantidad inválida.', 'warning')
     
-if book.stock < qty:
+if product.stock < qty:
     flash('No hay suficiente stock disponible.', 'danger')
     
-if existing_item and book.stock < item.quantity + qty:
+if existing_item and product.stock < item.quantity + qty:
     flash('No hay suficiente stock para aumentar.', 'danger')
 ```
 
 ### Mensajes
-- ✅ Éxito: `"✅ Añadido {qty} x '{title}' al carrito."`
+- ✅ Éxito: `"✅ Añadido {qty} x '{name}' al carrito."`
 - ❌ Error: Cantidad inválida, stock insuficiente
 
 ### Redireccionamiento
@@ -340,8 +340,8 @@ Reduce la cantidad de un producto o lo elimina completamente del carrito.
 5. Guarda cambios
 
 ### Mensajes
-- Si reduce: "Se eliminó una unidad de '{title}'."
-- Si elimina: "'{title}' fue eliminado del carrito."
+- Si reduce: "Se eliminó una unidad de '{name}'."
+- Si elimina: "'{name}' fue eliminado del carrito."
 
 ### Redireccionamiento
 - Siempre redirige a `/cart` (ver carrito)
@@ -363,8 +363,8 @@ if not cart or len(cart.items) == 0:
     return redirect(url_for('catalogo'))
 
 for item in cart.items:
-    if item.book.stock < item.quantity:
-        flash(f'No hay suficiente stock para "{item.book.title}".', 'danger')
+    if item.product.stock < item.quantity:
+        flash(f'No hay suficiente stock para "{item.product.name}".', 'danger')
         return redirect(url_for('view_cart'))
 ```
 
@@ -375,7 +375,7 @@ for item in cart.items:
    - `status = 'created'`
    - `total = 0.0`
 4. Para cada CartItem:
-   - Reduce stock del libro
+   - Reduce stock del producto
    - Crea OrderItem (copia del CartItem)
    - Suma cantidad × precio al total
    - Elimina CartItem del carrito
@@ -511,7 +511,7 @@ Muestra todos los detalles de un pedido específico.
 #### Tabla de Productos
 | Columna | Descripción |
 |---------|-------------|
-| Producto | Título + Autor |
+| Producto | Nombre + Marca |
 | Cantidad | Cantidad comprada |
 | Precio Unitario | Precio en momento de compra |
 | Subtotal | cantidad × precio |
@@ -550,7 +550,7 @@ if order.status not in ['created', 'paid']:
 1. Restaura stock para cada item:
    ```python
    for item in order.items:
-       item.book.stock += item.quantity
+       item.product.stock += item.quantity
    ```
 2. Cambia estado a `'cancelled'`
 3. Guarda en BD
@@ -600,7 +600,7 @@ Muestra la factura del pedido con opción de imprimir/descargar.
 #### Detalles de Productos
 | Columna | Formato |
 |---------|---------|
-| Producto | Título + Autor |
+| Producto | Nombre + Marca |
 | Cantidad | Número entero |
 | Precio Unitario | $XX.XX |
 | Subtotal | $XX.XX |
@@ -655,146 +655,146 @@ Dashboard principal del administrador.
 
 ### Información Mostrada
 - Total de usuarios
-- Total de libros
+- Total de productos
 - Total de pedidos
 - Total de ingresos (si aplica)
 
 ### Opciones de Navegación
-- 📚 **Gestión de Libros** → `/admin/books`
+- 👗 **Gestión de Productos** → `/admin/products`
 - 👥 **Gestión de Usuarios** → `/admin/users`
 - 📦 **Gestión de Pedidos** → `/admin/orders`
 
 ---
 
-## 📚 Gestión de Libros (`/admin/books`)
+## 👗 Gestión de Productos (`/admin/products`)
 
 **Acceso**: Admin solamente  
 **Método**: GET  
-**Template**: `admin_books.html`
+**Template**: `admin_products.html`
 
 ### Descripción
-Tabla de todos los libros en el sistema.
+Tabla de todos los productos en el sistema.
 
-### Información por Libro
+### Información por Producto
 | Columna | Descripción |
 |---------|-------------|
 | ID | Identificador |
-| Portada | Imagen del libro |
-| Título | Nombre del libro |
-| Autor | Autor del libro |
+| Imagen | Imagen del producto |
+| Nombre | Nombre del producto |
+| Marca | Marca de la prenda |
 | Categoría | Categoría asignada |
 | Precio | Precio de venta |
 | Stock | Cantidad disponible |
 | Acciones | Editar, Eliminar |
 
 ### Botones de Acción
-- **"➕ Crear Libro"** → `/admin/books/create`
-- **"✏️ Editar"** → `/admin/books/edit/<id>`
-- **"🗑️ Eliminar"** → POST `/admin/books/delete/<id>`
+- **"➕ Crear Producto"** → `/admin/products/create`
+- **"✏️ Editar"** → `/admin/products/edit/<id>`
+- **"🗑️ Eliminar"** → POST `/admin/products/delete/<id>`
 
 ### Ordenamiento
-- Los libros se ordenan por ID descendente (más recientes primero)
+- Los productos se ordenan por ID descendente (más recientes primero)
 
 ---
 
-### Crear Libro (`/admin/books/create`)
+### Crear Producto (`/admin/products/create`)
 
 **Acceso**: Admin solamente  
 **Método**: GET (formulario) / POST (crear)  
-**Template**: `edit_book.html` (reutilizado con action="Crear")
+**Template**: `edit_product.html` (reutilizado con action="Crear")
 
 ### Campos del Formulario
 | Campo | Tipo | Validación |
 |-------|------|-----------|
-| Título | String | Requerido, máx 200 |
-| Autor | String | Requerido, máx 200 |
+| Nombre | String | Requerido, máx 200 |
+| Marca | String | Requerido, máx 200 |
 | Categoría | String | Opcional, máx 100 |
 | Precio | Float | Requerido, ≥ 0 |
 | Stock | Integer | Requerido, ≥ 0 |
 | Descripción | Text | Opcional, máx 2000 |
-| Portada | File | Opcional, jpg/jpeg/png |
+| Imagen | File | Opcional, jpg/jpeg/png |
 
 ### Procesamiento
 1. Valida todos los campos
-2. Si hay portada:
+2. Si hay imagen:
    - Valida que sea imagen (jpg/jpeg/png)
    - Genera nombre seguro: `secure_filename()`
    - Crea carpeta `static/uploads/` si no existe
    - Guarda archivo
-3. Crea nuevo Book en BD
+3. Crea nuevo Product en BD
 4. Guarda cambios
 
 ### Ruta de Archivos
 - Destino: `static/uploads/{filename}`
-- Acceso web: `static/uploads/{cover_filename}`
+- Acceso web: `static/uploads/{image_filename}`
 
 ### Mensaje de Éxito
-- "✅ Libro creado correctamente."
+- "✅ Producto creado correctamente."
 
 ### Redireccionamiento
-- Éxito → `/admin/books` (lista de libros)
+- Éxito → `/admin/products` (lista de productos)
 
 ---
 
-### Editar Libro (`/admin/books/edit/<book_id>`)
+### Editar Producto (`/admin/products/edit/<product_id>`)
 
 **Acceso**: Admin solamente  
 **Método**: GET (formulario) / POST (guardar)  
-**Template**: `edit_book.html` (con action="Editar")
+**Template**: `edit_product.html` (con action="Editar")
 
 ### Lógica
-1. Obtiene libro por ID (404 si no existe)
+1. Obtiene producto por ID (404 si no existe)
 2. Si GET → Llena formulario con datos actuales
 3. Si POST → Actualiza campos
 
 ### Campos Editables
-- Título, Autor, Categoría, Precio, Stock, Descripción
-- Portada (puede cambiarla)
+- Nombre, Marca, Categoría, Precio, Stock, Descripción
+- Imagen (puede cambiarla)
 
-### Actualización de Portada
-- Si sube nueva portada:
+### Actualización de Imagen
+- Si sube nueva imagen:
   - Valida formato
   - Guarda nuevo archivo
-  - Actualiza `cover_filename`
-- Si no sube → Mantiene portada anterior
+  - Actualiza `image_filename`
+- Si no sube → Mantiene imagen anterior
 
 ### Campos No Editables
 - ID
 - Fecha de creación (si la hubiera)
 
 ### Mensaje de Éxito
-- "✅ Libro actualizado."
+- "✅ Producto actualizado."
 
 ### Redireccionamiento
-- Éxito → `/admin/books` (lista de libros)
+- Éxito → `/admin/products` (lista de productos)
 
 ---
 
-### Eliminar Libro (`/admin/books/delete/<book_id>`)
+### Eliminar Producto (`/admin/products/delete/<product_id>`)
 
 **Acceso**: Admin solamente  
 **Método**: POST  
 
 ### Validación
 ```python
-existing_orders = OrderItem.query.filter_by(book_id=book.id).first()
+existing_orders = OrderItem.query.filter_by(product_id=product.id).first()
 if existing_orders:
-    flash("⚠️ No puedes eliminar este libro porque tiene pedidos registrados.", "warning")
-    return redirect(url_for('admin_books'))
+    flash("⚠️ No puedes eliminar este producto porque tiene pedidos registrados.", "warning")
+    return redirect(url_for('admin_products'))
 ```
 
 ### Lógica
-1. Obtiene libro por ID
+1. Obtiene producto por ID
 2. Verifica si tiene pedidos asociados
 3. Si tiene pedidos → No permite eliminar
 4. Si no tiene → Elimina de BD
 
 ### Mensajes
-- ❌ Con pedidos: "⚠️ No puedes eliminar este libro porque tiene pedidos registrados."
-- ✅ Sin pedidos: "✅ Libro eliminado correctamente."
+- ❌ Con pedidos: "⚠️ No puedes eliminar este producto porque tiene pedidos registrados."
+- ✅ Sin pedidos: "✅ Producto eliminado correctamente."
 
 ### Redireccionamiento
-- Siempre → `/admin/books`
+- Siempre → `/admin/products`
 
 ---
 
@@ -1045,10 +1045,10 @@ Prueba la conexión a la base de datos.
 | | `/invoice/<id>` | GET | Sí | user, admin |
 | **Admin** |
 | | `/admin` | GET | Sí | admin |
-| | `/admin/books` | GET | Sí | admin |
-| | `/admin/books/create` | GET, POST | Sí | admin |
-| | `/admin/books/edit/<id>` | GET, POST | Sí | admin |
-| | `/admin/books/delete/<id>` | POST | Sí | admin |
+| | `/admin/products` | GET | Sí | admin |
+| | `/admin/products/create` | GET, POST | Sí | admin |
+| | `/admin/products/edit/<id>` | GET, POST | Sí | admin |
+| | `/admin/products/delete/<id>` | POST | Sí | admin |
 | | `/admin/users` | GET | Sí | admin |
 | | `/admin/users/add` | GET, POST | Sí | admin |
 | | `/admin/users/edit/<id>` | GET, POST | Sí | admin |
