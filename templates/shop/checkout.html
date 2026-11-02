@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import field %}
+{% block title %}Datos de entrega{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-title"><h1>Datos de entrega</h1><p class="text-muted mb-0">Solo entregamos en {{ delivery_municipalities | join_es }}.</p></div>
+  {% if form.errors %}<div class="alert alert-danger" role="alert">Revisa los campos marcados para continuar.</div>{% endif %}
+  <div class="cart-layout">
+    <form method="post" data-loading="Creando pedido..." aria-label="Datos de entrega" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.recipient_name) }}
+      <div class="row">
+        <div class="col-md-6">{{ field(form.phone, hint="10 dígitos, por ejemplo 3001234567.") }}</div>
+        <div class="col-md-6">{{ field(form.municipality) }}</div>
+      </div>
+      {{ field(form.address, hint="Calle o carrera, número y datos como torre o apartamento.") }}
+      <div class="row">
+        <div class="col-md-6">{{ field(form.neighborhood) }}</div>
+        <div class="col-md-6">{{ field(form.postal_code) }}</div>
+      </div>
+      {{ field(form.address_notes) }}
+      <div class="d-flex flex-wrap gap-2">
+        <button class="btn btn-dark btn-lg" type="submit">Continuar al pago</button>
+        <a class="btn btn-outline-dark btn-lg" href="{{ url_for('cart.view_cart') }}">Volver al carrito</a>
+      </div>
+    </form>
+    <aside class="summary" aria-label="Resumen del pedido">
+      <h2 class="h5 mb-3">Tu pedido</h2>
+      {% for line in view.lines %}
+        <div class="row-line"><span>{{ line.quantity }} × {{ line.product.name }}{% if line.size_label %} ({{ line.size_label }}){% endif %}</span><span>{{ line.subtotal | cop }}</span></div>
+      {% endfor %}
+      <div class="row-line total"><span>Total</span><span>{{ view.total | cop }}</span></div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

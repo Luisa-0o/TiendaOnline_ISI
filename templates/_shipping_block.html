@@ -1,0 +1,5 @@
+{% if order.has_shipping_info %}
+  <p class="mb-0">{{ order.recipient_name }} · {{ order.phone }}<br>{{ order.address }}, {{ order.neighborhood }}<br>{{ order.municipality }}, Antioquia{% if order.postal_code %} · CP {{ order.postal_code }}{% endif %}{% if order.address_notes %}<br><span class="text-muted">{{ order.address_notes }}</span>{% endif %}</p>
+{% else %}
+  <p class="text-muted mb-0">Este pedido se registró antes de guardar datos de entrega.</p>
+{% endif %}

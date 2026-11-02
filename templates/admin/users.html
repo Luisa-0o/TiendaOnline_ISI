@@ -1,0 +1,12 @@
+{% extends 'admin/base_admin.html' %}
+{% from '_macros.html' import csrf %}
+{% block title %}Usuarios{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h1 class="mb-0">Usuarios</h1><a class="btn btn-dark" href="{{ url_for('admin.add_user') }}">Agregar usuario</a></div>
+<div class="panel p-0"><div class="table-responsive"><table class="table align-middle mb-0">
+  <thead><tr><th scope="col">ID</th><th scope="col">Nombre</th><th scope="col">Correo</th><th scope="col">Rol</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
+  <tbody>{% for u in users %}<tr><td>{{ u.id }}</td><td>{{ u.username }}</td><td>{{ u.email }}</td><td>{{ 'Administrador' if u.is_admin else 'Cliente' }}</td>
+    <td class="text-end text-nowrap"><a class="btn btn-sm btn-outline-dark" href="{{ url_for('admin.edit_user', user_id=u.id) }}">Editar</a>
+    {% if u.id != current_user.id %}<form class="d-inline" method="post" action="{{ url_for('admin.delete_user', user_id=u.id) }}" data-confirm="¿Eliminar a {{ u.username }}?">{{ csrf() }}<button class="btn btn-sm btn-outline-dark" type="submit">Eliminar</button></form>{% endif %}</td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% endblock %}

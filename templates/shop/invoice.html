@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Factura #{{ order.id }}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:52rem">
+  <div class="panel invoice my-4 p-md-5">
+    <div class="d-flex justify-content-between flex-wrap gap-2 mb-4">
+      <div><h1 class="h3 mb-1">Factura de compra</h1><p class="text-muted mb-0">Névora Moda!</p></div>
+      <div class="text-md-end"><strong>Pedido #{{ order.id }}</strong><br>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '—' }}<br>Estado: {{ order.status_label }}</div>
+    </div>
+    <div class="row g-4 mb-4">
+      <div class="col-md-6"><h2 class="h6">Cliente</h2><p class="mb-0">{{ order.user.username }}<br>{{ order.user.email }}</p></div>
+      <div class="col-md-6"><h2 class="h6">Entrega</h2>{% include '_shipping_block.html' %}</div>
+    </div>
+    {% include '_order_items.html' %}
+    <p class="mb-1"><strong>Método de pago:</strong> {{ order.payment_method or 'Pendiente de pago' }}</p>
+    <p class="small text-muted">Comprobante generado el {{ now.strftime('%d/%m/%Y %H:%M') }}. Pago simulado: documento académico sin validez fiscal.</p>
+    <div class="d-flex flex-wrap gap-2 no-print mt-3">
+      <button class="btn btn-dark" type="button" onclick="window.print()"><i class="bi bi-printer" aria-hidden="true"></i> Imprimir factura</button>
+      {% if order.is_payable and order.user_id == current_user.id %}<a class="btn btn-outline-dark" href="{{ url_for('checkout.payment', order_id=order.id) }}">Continuar con el pago</a>{% endif %}
+      <a class="btn btn-outline-dark" href="{{ url_for('checkout.view_orders') if order.user_id == current_user.id else url_for('admin.order_detail', order_id=order.id) }}">Volver</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

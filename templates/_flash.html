@@ -1,0 +1,13 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container pt-3">
+      {% for category, msg in messages %}
+        {% set kind = category if category in ('success', 'danger', 'warning', 'info') else 'info' %}
+        <div class="alert alert-{{ kind }} alert-dismissible fade show" role="{{ 'alert' if kind in ('danger', 'warning') else 'status' }}">
+          {{ msg }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar aviso"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

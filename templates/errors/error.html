@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container empty-state">
+  <p class="display-4 fw-bold mb-0">{{ code }}</p>
+  <h1 class="h3">{{ title }}</h1>
+  <p class="text-muted">{{ message }}</p>
+  <a class="btn btn-dark" href="{{ url_for('shop.home') }}">Volver al inicio</a>
+</div>
+{% endblock %}

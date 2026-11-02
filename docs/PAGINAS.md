@@ -1,3 +1,5 @@
+> **Aviso:** este documento describe la versión anterior del proyecto. Para la versión actual consulta el `README.md` raíz y `docs/ARQUITECTURA.md`.
+
 # 📄 Documentación de Páginas
 
 Este documento describe todas las páginas de la aplicación, sus funcionalidades y datos asociados.

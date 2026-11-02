@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import field, csrf %}
+{% block title %}Pago del pedido #{{ order.id }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-title"><h1>Pagar pedido #{{ order.id }}</h1></div>
+  <div class="cart-layout">
+    <form method="post" data-loading="Procesando pago..." aria-label="Pago" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="alert alert-info" role="note">Pago simulado: no se realiza ningún cobro y no guardamos datos de tarjeta.</div>
+      {{ field(form.payment_method) }}
+      <div id="card-fields" data-card-methods="{{ card_methods | join(',') }}">
+        {{ field(form.card_number) }}
+        <div class="row">
+          <div class="col-6">{{ field(form.expiry_date) }}</div>
+          <div class="col-6">{{ field(form.cvv) }}</div>
+        </div>
+      </div>
+      <p id="cash-note" class="alert alert-warning" hidden>Pagarás en un punto Efecty. Para esta demostración el pago se registra de inmediato.</p>
+      <button class="btn btn-dark btn-lg" type="submit">Pagar {{ order.total | cop }}</button>
+    </form>
+    <aside class="summary" aria-label="Resumen del pedido">
+      <h2 class="h5 mb-3">Pedido #{{ order.id }}</h2>
+      {% for item in order.items %}
+        <div class="row-line"><span>{{ item.quantity }} × {{ item.product.name }}{% if item.size_label %} ({{ item.size_label }}){% endif %}</span><span>{{ item.line_total() | cop }}</span></div>
+      {% endfor %}
+      <div class="row-line total"><span>Total</span><span>{{ order.total | cop }}</span></div>
+      <hr>
+      <p class="small mb-1"><strong>Entrega en {{ order.municipality }}</strong><br>{{ order.address }}, {{ order.neighborhood }}</p>
+      <form method="post" action="{{ url_for('checkout.cancel_order', order_id=order.id) }}" data-confirm="¿Cancelar este pedido?" class="mt-3">
+        {{ csrf() }}<button class="btn btn-link btn-sm p-0" type="submit">Cancelar pedido</button>
+      </form>
+    </aside>
+  </div>
+</div>
+{% endblock %}
