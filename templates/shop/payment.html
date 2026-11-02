@@ -7,7 +7,7 @@
   <div class="cart-layout">
     <form method="post" data-loading="Procesando pago..." aria-label="Pago" novalidate>
       {{ form.hidden_tag() }}
-      <div class="alert alert-info" role="note">Pago simulado</div>
+      <div class="alert alert-info" role="note">Pago simulado: no se realiza ningún cobro y no guardamos datos de tarjeta.</div>
       {{ field(form.payment_method) }}
       <div id="card-fields" data-card-methods="{{ card_methods | join(',') }}">
         {{ field(form.card_number) }}
@@ -16,7 +16,7 @@
           <div class="col-6">{{ field(form.cvv) }}</div>
         </div>
       </div>
-      <p id="cash-note" class="alert alert-warning" hidden>Pagarás en un punto Efecty.</p>
+      <p id="cash-note" class="alert alert-warning" hidden>Pagarás en un punto Efecty. Para esta demostración el pago se registra de inmediato.</p>
       <button class="btn btn-dark btn-lg" type="submit">Pagar {{ order.total | cop }}</button>
     </form>
     <aside class="summary" aria-label="Resumen del pedido">
