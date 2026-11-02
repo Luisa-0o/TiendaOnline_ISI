@@ -1,4 +1,4 @@
-# 👗 Névora Moda! – Tienda de ropa en línea
+# Névora Moda! – Tienda de ropa en línea
 
 Tienda de ropa minimalista construida con **Flask**. Cualquier persona puede explorar el catálogo y armar un carrito sin crear cuenta; el inicio de sesión solo se pide al pagar. Incluye registro y cuentas de usuario, pedidos con entrega restringida a **Medellín, Bello y Envigado**, pagos **simulados**, facturas imprimibles y un panel de administración.
 
