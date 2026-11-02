@@ -1,0 +1,17 @@
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead><tr><th scope="col">Prenda</th><th scope="col">Talla</th><th scope="col" class="text-end">Cantidad</th><th scope="col" class="text-end">Precio</th><th scope="col" class="text-end">Subtotal</th></tr></thead>
+    <tbody>
+      {% for item in order.items %}
+      <tr>
+        <td>{{ item.product.name }}<div class="small text-muted">{{ item.product.brand }}</div></td>
+        <td>{{ item.size_label or '—' }}</td>
+        <td class="text-end">{{ item.quantity }}</td>
+        <td class="text-end">{{ item.price | cop }}</td>
+        <td class="text-end">{{ item.line_total() | cop }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot><tr><th scope="row" colspan="4" class="text-end">Total</th><th class="text-end">{{ order.total | cop }}</th></tr></tfoot>
+  </table>
+</div>

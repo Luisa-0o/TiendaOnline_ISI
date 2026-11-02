@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf %}
+{% block title %}Carrito{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-title"><h1>Tu carrito</h1></div>
+  {% if view.is_empty %}
+    <div class="empty-state">
+      <i class="bi bi-bag" aria-hidden="true"></i>
+      <h2 class="h4 mt-3">Tu carrito está vacío</h2>
+      <p class="text-muted">Agrega prendas del catálogo; las conservamos aunque cierres el navegador.</p>
+      <a class="btn btn-dark" href="{{ url_for('shop.catalogo') }}">Explorar el catálogo</a>
+    </div>
+  {% else %}
+  <div class="cart-layout">
+    <section aria-label="Prendas en tu carrito">
+      {% for line in view.lines %}
+        {% set p = line.product %}
+        <div class="cart-line">
+          <a class="thumb" href="{{ url_for('shop.product_detail', product_id=p.id) }}"><img src="{{ p.image_url() }}" alt="{{ p.name }}" loading="lazy"></a>
+          <div>
+            <a class="fw-semibold text-decoration-none" href="{{ url_for('shop.product_detail', product_id=p.id) }}">{{ p.name }}</a>
+            <div class="small text-muted">{{ p.brand }}{% if line.size_label %} · Talla {{ line.size_label }}{% endif %}</div>
+            <div class="small mt-1">{{ line.unit_price | cop }} c/u</div>
+            {% if line.problem %}<div class="field-error mt-2" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i><span>{{ line.problem }}</span></div>{% endif %}
+            <div class="d-flex flex-wrap gap-3 align-items-center mt-3">
+              <form class="qty-form" method="post" action="{{ url_for('cart.update_cart', product_id=p.id) }}">
+                {{ csrf() }}
+                <input type="hidden" name="size_id" value="{{ line.size.id if line.size else '' }}">
+                <label class="visually-hidden" for="qty-{{ loop.index }}">Cantidad de {{ p.name }}</label>
+                <input id="qty-{{ loop.index }}" class="form-control form-control-sm" type="number" name="quantity" value="{{ line.quantity }}" min="0" max="{{ [line.max_selectable, config.CART_MAX_QTY_PER_LINE] | min if line.max_selectable else 1 }}" required>
+                <button class="btn btn-sm btn-outline-dark" type="submit">Actualizar</button>
+              </form>
+              <form method="post" action="{{ url_for('cart.remove_from_cart', product_id=p.id) }}">
+                {{ csrf() }}
+                <input type="hidden" name="size_id" value="{{ line.size.id if line.size else '' }}">
+                <button class="btn btn-link btn-sm p-0" type="submit"><i class="bi bi-trash" aria-hidden="true"></i> Quitar<span class="visually-hidden"> {{ p.name }}</span></button>
+              </form>
+            </div>
+          </div>
+          <div class="line-total fw-bold text-end">{{ line.subtotal | cop }}</div>
+        </div>
+      {% endfor %}
+      <a class="d-inline-block mt-3" href="{{ url_for('shop.catalogo') }}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Seguir comprando</a>
+    </section>
+    <aside class="summary" aria-label="Resumen del pedido">
+      <h2 class="h5 mb-3">Resumen</h2>
+      <div class="row-line"><span>Artículos</span><span>{{ view.count }}</span></div>
+      <div class="row-line total"><span>Total</span><span>{{ view.total | cop }}</span></div>
+      <p class="small text-muted mt-3 mb-3">Los precios y las existencias se confirman de nuevo al finalizar la compra. Entregamos en {{ delivery_municipalities | join_es }}.</p>
+      {% if view.has_problems %}
+        <button class="btn btn-dark w-100" type="button" disabled>Finalizar compra</button>
+        <p class="small field-error mt-2" role="alert">Corrige las prendas marcadas para continuar.</p>
+      {% else %}
+        <a class="btn btn-dark w-100" href="{{ url_for('checkout.checkout') }}">Finalizar compra</a>
+        {% if not current_user.is_authenticated %}<p class="small text-muted mt-2 mb-0">Te pediremos iniciar sesión o crear una cuenta; tu carrito se conserva.</p>{% endif %}
+      {% endif %}
+    </aside>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

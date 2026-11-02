@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import status_badge %}
+{% block title %}Mis pedidos{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-title"><h1>Mis pedidos</h1></div>
+  {% if orders %}
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th scope="col">Pedido</th><th scope="col">Fecha</th><th scope="col">Estado</th><th scope="col" class="text-end">Total</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <th scope="row">#{{ order.id }}</th>
+          <td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '—' }}</td>
+          <td>{{ status_badge(order) }}</td>
+          <td class="text-end">{{ order.total | cop }}</td>
+          <td class="text-end text-nowrap">
+            {% if order.is_payable %}<a class="btn btn-sm btn-dark" href="{{ url_for('checkout.payment', order_id=order.id) }}">Pagar</a>{% endif %}
+            <a class="btn btn-sm btn-outline-dark" href="{{ url_for('checkout.view_order', order_id=order.id) }}">Ver detalle</a>
+            <a class="btn btn-sm btn-outline-dark" href="{{ url_for('checkout.view_invoice', order_id=order.id) }}">Factura</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="empty-state"><i class="bi bi-box-seam" aria-hidden="true"></i><h2 class="h4 mt-3">Aún no tienes pedidos</h2><a class="btn btn-dark mt-2" href="{{ url_for('shop.catalogo') }}">Ir al catálogo</a></div>
+  {% endif %}
+</div>
+{% endblock %}

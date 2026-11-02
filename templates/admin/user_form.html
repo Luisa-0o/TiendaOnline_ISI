@@ -1,0 +1,14 @@
+{% extends 'admin/base_admin.html' %}
+{% from '_macros.html' import field %}
+{% block title %}{{ action }} usuario{% endblock %}
+{% block content %}
+<h1 class="mb-3">{{ action }} usuario</h1>
+<form method="post" class="panel" style="max-width:34rem" novalidate>
+  {{ form.hidden_tag() }}
+  {{ field(form.username) }}{{ field(form.email) }}
+  {{ field(form.password, hint=('Déjala vacía para conservar la actual.' if user else 'Mínimo 6 caracteres.')) }}
+  {{ field(form.role) }}
+  <button class="btn btn-dark" type="submit">Guardar</button>
+  <a class="btn btn-outline-dark" href="{{ url_for('admin.users') }}">Cancelar</a>
+</form>
+{% endblock %}

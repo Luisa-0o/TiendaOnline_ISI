@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Panel{% endblock %} · Administración Névora</title>
+  <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='logo.jpg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/nevora.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <div class="admin-shell">
+    <nav class="admin-side" aria-label="Administración">
+      <a class="brand" href="{{ url_for('admin.dashboard') }}"><img src="{{ url_for('static', filename='logo.jpg') }}" alt="" width="32" height="32">Névora <span class="tag-admin">ADMIN</span></a>
+      {% set ep = request.endpoint or '' %}
+      <a class="nav-item" href="{{ url_for('admin.dashboard') }}" {% if ep == 'admin.dashboard' %}aria-current="page"{% endif %}><i class="bi bi-speedometer2" aria-hidden="true"></i> Resumen</a>
+      <a class="nav-item" href="{{ url_for('admin.products') }}" {% if 'product' in ep %}aria-current="page"{% endif %}><i class="bi bi-bag" aria-hidden="true"></i> Productos</a>
+      <a class="nav-item" href="{{ url_for('admin.orders') }}" {% if 'order' in ep %}aria-current="page"{% endif %}><i class="bi bi-box-seam" aria-hidden="true"></i> Pedidos</a>
+      <a class="nav-item" href="{{ url_for('admin.users') }}" {% if 'user' in ep %}aria-current="page"{% endif %}><i class="bi bi-people" aria-hidden="true"></i> Usuarios</a>
+      <hr class="border-secondary">
+      <a class="nav-item" href="{{ url_for('shop.home') }}"><i class="bi bi-shop" aria-hidden="true"></i> Ver la tienda</a>
+      <form method="post" action="{{ url_for('auth.logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="nav-item btn btn-link text-start w-100 border-0" style="color:#dcdad6" type="submit"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión</button>
+      </form>
+    </nav>
+    <main class="admin-main" id="contenido">
+      {% include '_flash.html' %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/nevora.js') }}"></script>
+</body>
+</html>

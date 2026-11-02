@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import status_badge, csrf %}
+{% block title %}Pedido #{{ order.id }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-title"><h1>Pedido #{{ order.id }} {{ status_badge(order) }}</h1>
+    <p class="text-muted mb-0">{{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '' }}{% if order.payment_method %} · Pagado con {{ order.payment_method }}{% endif %}</p></div>
+  <div class="row g-4 mb-4">
+    <div class="col-md-6"><div class="panel h-100"><h2 class="h5">Entrega</h2>{% include '_shipping_block.html' %}</div></div>
+    <div class="col-md-6"><div class="panel h-100"><h2 class="h5">Acciones</h2>
+      <div class="d-flex flex-wrap gap-2">
+        {% if order.is_payable %}<a class="btn btn-dark" href="{{ url_for('checkout.payment', order_id=order.id) }}">Pagar ahora</a>{% endif %}
+        <a class="btn btn-outline-dark" href="{{ url_for('checkout.view_invoice', order_id=order.id) }}">Ver factura</a>
+        {% if order.is_cancellable %}
+          <form method="post" action="{{ url_for('checkout.cancel_order', order_id=order.id) }}" data-confirm="¿Seguro que quieres cancelar este pedido?">{{ csrf() }}<button class="btn btn-outline-dark" type="submit">Cancelar pedido</button></form>
+        {% endif %}
+      </div></div></div>
+  </div>
+  {% include '_order_items.html' %}
+  <a href="{{ url_for('checkout.view_orders') }}"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a mis pedidos</a>
+</div>
+{% endblock %}
