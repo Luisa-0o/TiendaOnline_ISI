@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import csrf %}
+{% block title %}Mi cuenta{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-title"><h1>Hola, {{ current_user.username }}</h1><p class="text-muted mb-0">{{ current_user.email }}</p></div>
+  <div class="row g-3">
+    <div class="col-md-6 col-lg-4"><div class="panel h-100"><h2 class="h5">Mis pedidos</h2><p class="text-muted">Consulta tus compras, facturas y estados de envío.</p><a class="btn btn-dark" href="{{ url_for('checkout.view_orders') }}">Ver pedidos</a></div></div>
+    {% if not current_user.is_admin %}
+    <div class="col-md-6 col-lg-4"><div class="panel h-100"><h2 class="h5">Categorías favoritas</h2><p class="text-muted">{{ current_user.favorite_categories | join(' y ') or 'Aún no has elegido categorías.' }}</p><a class="btn btn-outline-dark" href="{{ url_for('auth.select_favs') }}">Elegir categorías</a></div></div>
+    {% endif %}
+    <div class="col-md-6 col-lg-4"><div class="panel h-100"><h2 class="h5">Contraseña</h2><p class="text-muted">Actualiza tu contraseña cuando quieras.</p><a class="btn btn-outline-dark" href="{{ url_for('auth.change_password') }}">Cambiar contraseña</a></div></div>
+    {% if current_user.is_admin %}
+    <div class="col-md-6 col-lg-4"><div class="panel h-100"><h2 class="h5">Administración</h2><p class="text-muted">Gestiona productos, usuarios y pedidos.</p><a class="btn btn-outline-dark" href="{{ url_for('admin.dashboard') }}">Ir al panel</a></div></div>
+    {% endif %}
+  </div>
+  <form method="post" action="{{ url_for('auth.logout') }}" class="mt-4" data-confirm="¿Cerrar sesión?">{{ csrf() }}<button class="btn btn-link p-0" type="submit"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión</button></form>
+</div>
+{% endblock %}

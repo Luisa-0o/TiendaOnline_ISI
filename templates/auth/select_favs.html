@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Categorías favoritas{% endblock %}
+{% block content %}
+<div class="container" style="max-width:44rem">
+  <div class="page-title"><h1>Elige tus 2 categorías favoritas</h1><p class="text-muted mb-0">Las usamos para mostrarte prendas que te pueden gustar.</p></div>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    {% if categories %}
+      <fieldset class="row g-2 mb-4">
+        <legend class="visually-hidden">Categorías disponibles</legend>
+        {% for cat in categories %}
+          <div class="col-6 col-md-4"><div class="form-check"><input class="form-check-input fav-checkbox" type="checkbox" name="categories" value="{{ cat }}" id="cat_{{ loop.index }}" {{ 'checked' if cat in current }}><label class="form-check-label" for="cat_{{ loop.index }}">{{ cat }}</label></div></div>
+        {% endfor %}
+      </fieldset>
+    {% else %}
+      <div class="alert alert-info">Todavía no hay categorías en el catálogo.</div>
+    {% endif %}
+    <button type="submit" class="btn btn-dark" {{ 'disabled' if not categories }}>Guardar preferencias</button>
+    <a href="{{ url_for('shop.catalogo') }}" class="btn btn-outline-dark">Omitir</a>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  var boxes = document.querySelectorAll('.fav-checkbox');
+  boxes.forEach(function (cb) { cb.addEventListener('change', function () {
+    if (Array.from(boxes).filter(function (c) { return c.checked; }).length > 2) { cb.checked = false; }
+  }); });
+</script>
+{% endblock %}

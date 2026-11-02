@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import product_grid %}
+{% set title_text = filters.category or (('Resultados para «' ~ filters.query ~ '»') if filters.query else 'Catálogo') %}
+{% block title %}{{ title_text }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="page-title">
+    <h1>{{ title_text }}</h1>
+    <p class="text-muted mb-0" role="status">{{ page.total }} {{ 'prenda' if page.total == 1 else 'prendas' }}</p>
+  </div>
+
+  <div class="d-lg-none mb-3">
+    <button class="btn btn-outline-dark w-100" type="button" data-bs-toggle="collapse" data-bs-target="#panelFiltros" aria-expanded="{{ 'true' if filters.active_count else 'false' }}" aria-controls="panelFiltros">
+      <i class="bi bi-sliders" aria-hidden="true"></i> Filtros{% if filters.active_count %} ({{ filters.active_count }}){% endif %}
+    </button>
+  </div>
+
+  <div class="catalog-layout">
+    <aside class="collapse d-lg-block {{ 'show' if filters.active_count }}" id="panelFiltros" aria-label="Filtros del catálogo">
+      <form class="filters" method="get" action="{{ url_for('shop.catalogo') }}">
+        <input type="hidden" name="sort" value="{{ filters.sort }}">
+        <fieldset>
+          <legend><label for="f-q">Buscar por nombre</label></legend>
+          <input id="f-q" class="form-control" type="search" name="q" value="{{ filters.query }}" maxlength="100" placeholder="Camisa, jean, tenis...">
+        </fieldset>
+        {% if facets.categories %}
+        <fieldset>
+          <legend>Categoría</legend>
+          <div class="form-check"><input class="form-check-input" type="radio" name="category" id="cat-all" value="" {{ 'checked' if not filters.category }}><label class="form-check-label" for="cat-all">Todas</label></div>
+          {% for c in facets.categories %}
+            <div class="form-check"><input class="form-check-input" type="radio" name="category" id="cat-{{ loop.index }}" value="{{ c }}" {{ 'checked' if filters.category == c }}><label class="form-check-label" for="cat-{{ loop.index }}">{{ c }}</label></div>
+          {% endfor %}
+        </fieldset>
+        {% endif %}
+        {% if facets.garment_types %}
+        <fieldset>
+          <legend><label for="f-type">Tipo de prenda</label></legend>
+          <select id="f-type" class="form-select" name="garment_type">
+            <option value="">Todos los tipos</option>
+            {% for t in facets.garment_types %}<option value="{{ t }}" {{ 'selected' if filters.garment_type == t }}>{{ t }}</option>{% endfor %}
+          </select>
+        </fieldset>
+        {% endif %}
+        {% if facets.sizes %}
+        <fieldset>
+          <legend>Talla</legend>
+          <div class="size-chips">
+            <input type="radio" name="size" id="size-all" value="" {{ 'checked' if not filters.size }}><label for="size-all">Todas</label>
+            {% for s in facets.sizes %}
+              <input type="radio" name="size" id="size-{{ loop.index }}" value="{{ s }}" {{ 'checked' if filters.size == s }}><label for="size-{{ loop.index }}">{{ s }}</label>
+            {% endfor %}
+          </div>
+        </fieldset>
+        {% endif %}
+        <fieldset>
+          <legend>Precio (COP)</legend>
+          <div class="row g-2">
+            <div class="col-6"><label class="form-label small" for="f-min">Mínimo</label><input id="f-min" class="form-control" type="number" name="min_price" min="0" step="1000" inputmode="numeric" value="{{ '%d' % filters.min_price if filters.min_price is not none else '' }}" placeholder="{{ '%d' % facets.min_price }}"></div>
+            <div class="col-6"><label class="form-label small" for="f-max">Máximo</label><input id="f-max" class="form-control" type="number" name="max_price" min="0" step="1000" inputmode="numeric" value="{{ '%d' % filters.max_price if filters.max_price is not none else '' }}" placeholder="{{ '%d' % facets.max_price }}"></div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Disponibilidad</legend>
+          {% for value, label in [('all', 'Todas'), ('available', 'Disponibles'), ('sold_out', 'Agotadas')] %}
+            <div class="form-check"><input class="form-check-input" type="radio" name="availability" id="av-{{ value }}" value="{{ value }}" {{ 'checked' if filters.availability == value }}><label class="form-check-label" for="av-{{ value }}">{{ label }}</label></div>
+          {% endfor %}
+        </fieldset>
+        <div class="d-grid gap-2 pt-2">
+          <button class="btn btn-dark" type="submit">Aplicar filtros</button>
+          {% if filters.active_count %}<a class="btn btn-outline-dark" href="{{ url_for('shop.catalogo', **({'sort': filters.sort} if filters.sort != 'newest' else {})) }}">Limpiar filtros</a>{% endif %}
+        </div>
+      </form>
+    </aside>
+
+    <section aria-label="Resultados">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+        <div>
+          {% if filters.query %}<a class="filter-chip" href="{{ url_for('shop.catalogo', **filters.as_params(q='')) }}" aria-label="Quitar búsqueda {{ filters.query }}">«{{ filters.query }}» <i class="bi bi-x" aria-hidden="true"></i></a>{% endif %}
+          {% if filters.category %}<a class="filter-chip" href="{{ url_for('shop.catalogo', **filters.as_params(category='')) }}" aria-label="Quitar categoría {{ filters.category }}">{{ filters.category }} <i class="bi bi-x" aria-hidden="true"></i></a>{% endif %}
+          {% if filters.garment_type %}<a class="filter-chip" href="{{ url_for('shop.catalogo', **filters.as_params(garment_type='')) }}" aria-label="Quitar tipo {{ filters.garment_type }}">{{ filters.garment_type }} <i class="bi bi-x" aria-hidden="true"></i></a>{% endif %}
+          {% if filters.size %}<a class="filter-chip" href="{{ url_for('shop.catalogo', **filters.as_params(size='')) }}" aria-label="Quitar talla {{ filters.size }}">Talla {{ filters.size }} <i class="bi bi-x" aria-hidden="true"></i></a>{% endif %}
+          {% if filters.min_price is not none or filters.max_price is not none %}<a class="filter-chip" href="{{ url_for('shop.catalogo', **filters.as_params(min_price='', max_price='')) }}" aria-label="Quitar filtro de precio">{{ (filters.min_price or 0) | cop }} – {{ (filters.max_price | cop) if filters.max_price is not none else 'sin tope' }} <i class="bi bi-x" aria-hidden="true"></i></a>{% endif %}
+          {% if filters.availability != 'all' %}<a class="filter-chip" href="{{ url_for('shop.catalogo', **filters.as_params(availability='')) }}" aria-label="Quitar filtro de disponibilidad">{{ 'Disponibles' if filters.availability == 'available' else 'Agotadas' }} <i class="bi bi-x" aria-hidden="true"></i></a>{% endif %}
+        </div>
+        <form method="get" action="{{ url_for('shop.catalogo') }}" class="d-flex align-items-center gap-2">
+          {% for key, value in filters.as_params(sort='').items() %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}
+          <label class="small fw-semibold mb-0" for="sort">Ordenar por</label>
+          <select id="sort" name="sort" class="form-select form-select-sm" style="width:auto" data-autosubmit>
+            {% for key, label in sort_options.items() %}<option value="{{ key }}" {{ 'selected' if filters.sort == key }}>{{ label }}</option>{% endfor %}
+          </select>
+          <noscript><button class="btn btn-sm btn-dark" type="submit">Ordenar</button></noscript>
+        </form>
+      </div>
+
+      {% if recommended %}
+        <div class="panel mb-4"><h2 class="h5 mb-3">Pensado para ti</h2>{{ product_grid(recommended) }}</div>
+      {% endif %}
+
+      {% if page.items %}
+        {{ product_grid(page.items) }}
+        {% if page.pages > 1 %}
+        <nav class="mt-5" aria-label="Paginación de resultados">
+          <ul class="pagination justify-content-center">
+            <li class="page-item {{ 'disabled' if not page.has_prev }}"><a class="page-link" href="{{ url_for('shop.catalogo', **filters.as_params(page=page.page - 1)) if page.has_prev else '#' }}" {{ 'tabindex=-1 aria-disabled=true' if not page.has_prev }}>Anterior</a></li>
+            {% for n in range(1, page.pages + 1) %}
+              <li class="page-item {{ 'active' if n == page.page }}"><a class="page-link" href="{{ url_for('shop.catalogo', **filters.as_params(page=n)) }}" {% if n == page.page %}aria-current="page"{% endif %}>{{ n }}</a></li>
+            {% endfor %}
+            <li class="page-item {{ 'disabled' if not page.has_next }}"><a class="page-link" href="{{ url_for('shop.catalogo', **filters.as_params(page=page.page + 1)) if page.has_next else '#' }}" {{ 'tabindex=-1 aria-disabled=true' if not page.has_next }}>Siguiente</a></li>
+          </ul>
+        </nav>
+        {% endif %}
+      {% else %}
+        <div class="empty-state">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <h2 class="h4 mt-3">No encontramos prendas con esos filtros</h2>
+          <p class="text-muted">Prueba con otra búsqueda o quita algunos filtros.</p>
+          <a class="btn btn-dark" href="{{ url_for('shop.catalogo') }}">Ver todo el catálogo</a>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

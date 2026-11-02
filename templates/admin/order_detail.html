@@ -1,0 +1,20 @@
+{% extends 'admin/base_admin.html' %}
+{% from '_macros.html' import status_badge, field %}
+{% block title %}Pedido #{{ order.id }}{% endblock %}
+{% block content %}
+<h1 class="mb-1">Pedido #{{ order.id }} {{ status_badge(order) }}</h1>
+<p class="text-muted">{{ order.user.username }} · {{ order.user.email }} · {{ order.created_at.strftime('%d/%m/%Y %H:%M') if order.created_at else '' }}{% if order.payment_method %} · {{ order.payment_method }}{% endif %}</p>
+<div class="row g-3 mb-4">
+  <div class="col-md-6"><div class="panel h-100"><h2 class="h5">Entrega</h2>{% include '_shipping_block.html' %}</div></div>
+  <div class="col-md-6"><div class="panel h-100"><h2 class="h5">Actualizar estado</h2>
+    <form method="post" action="{{ url_for('admin.update_order_status', order_id=order.id) }}" class="d-flex gap-2 align-items-end">
+      {{ form.hidden_tag() }}
+      <div class="flex-grow-1"><label class="form-label" for="status">Estado</label>{{ form.status(class_="form-select") }}</div>
+      <button class="btn btn-dark" type="submit">Actualizar</button>
+    </form>
+    <p class="small text-muted mt-2 mb-0">Cancelar un pedido devuelve las existencias al inventario.</p>
+  </div></div>
+</div>
+<div class="panel">{% include '_order_items.html' %}</div>
+<div class="mt-3 d-flex gap-3"><a href="{{ url_for('checkout.view_invoice', order_id=order.id) }}">Ver factura</a><a href="{{ url_for('admin.orders') }}">Volver a pedidos</a></div>
+{% endblock %}

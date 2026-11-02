@@ -1,3 +1,5 @@
+> **Aviso:** este documento describe la versión anterior del proyecto. Para la versión actual consulta el `README.md` raíz y `docs/ARQUITECTURA.md`.
+
 # 🗄️ Modelos de Base de Datos
 
 Documentación detallada de todos los modelos y relaciones de base de datos de la aplicación.

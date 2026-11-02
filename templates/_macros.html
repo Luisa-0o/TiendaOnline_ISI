@@ -1,0 +1,42 @@
+{# Macros reutilizables de la interfaz #}
+{% macro field(f, hint=None) %}
+  {% set err_id = f.id ~ '-error' %}
+  <div class="mb-3">
+    {{ f.label(class_="form-label") }}
+    {% if f.type == 'SelectField' %}
+      {{ f(class_="form-select" ~ (" is-invalid" if f.errors else ""), **{"aria-describedby": err_id, "aria-invalid": "true" if f.errors else "false"}) }}
+    {% else %}
+      {{ f(class_="form-control" ~ (" is-invalid" if f.errors else ""), **{"aria-describedby": err_id, "aria-invalid": "true" if f.errors else "false"}) }}
+    {% endif %}
+    {% if hint or f.description %}<div class="form-hint">{{ hint or f.description }}</div>{% endif %}
+    <div id="{{ err_id }}" aria-live="polite">
+      {% for error in f.errors %}
+        <div class="field-error" role="alert"><i class="bi bi-exclamation-circle" aria-hidden="true"></i><span>{{ error }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro status_badge(order) %}<span class="status status-{{ order.status or 'created' }}">{{ order.status_label }}</span>{% endmacro %}
+
+{% macro product_card(p, threshold=5) %}
+  <article class="product-card {{ 'is-soldout' if not p.is_available }}">
+    <div class="media">
+      <img src="{{ p.image_url() }}" alt="{{ p.name }}{{ ' (sin foto disponible)' if not p.has_image }}" loading="lazy" width="600" height="800">
+      {% if not p.is_available %}<span class="ribbon soldout">Agotado</span>
+      {% elif p.stock <= threshold %}<span class="ribbon">Últimas unidades</span>{% endif %}
+    </div>
+    <div class="info">
+      <a class="name" href="{{ url_for('shop.product_detail', product_id=p.id) }}">{{ p.name }}</a>
+      <span class="brand-line">{{ p.brand }}{% if p.garment_type %} · {{ p.garment_type }}{% endif %}</span>
+      {% if p.has_sizes %}<span class="sizes-line">Tallas: {{ p.ordered_sizes | selectattr('stock') | map(attribute='label') | join(' ') or 'agotadas' }}</span>{% endif %}
+      <span class="price">{{ p.price | cop }}</span>
+    </div>
+  </article>
+{% endmacro %}
+
+{% macro product_grid(products) %}
+  <div class="product-grid">{% for p in products %}{{ product_card(p) }}{% endfor %}</div>
+{% endmacro %}
+
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}

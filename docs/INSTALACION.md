@@ -1,3 +1,5 @@
+> **Aviso:** este documento describe la versión anterior del proyecto. Para la versión actual consulta el `README.md` raíz y `docs/ARQUITECTURA.md`.
+
 # ⚙️ Guía de Instalación
 
 Instrucciones detalladas para instalar y ejecutar el proyecto en diferentes plataformas.

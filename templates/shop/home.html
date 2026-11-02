@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import product_grid %}
+{% block title %}Ropa para todos los días{% endblock %}
+{% block content %}
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-copy">
+    <h1 id="hero-title">Ropa cómoda para todos los días</h1>
+    <p>Descubre las novedades de Névora Moda: prendas pensadas para vestirte bien sin complicarte.</p>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-dark btn-lg" href="{{ url_for('shop.catalogo') }}">Ver el catálogo</a>
+      {% if new_arrivals %}<a class="btn btn-outline-dark btn-lg" href="#novedades">Ver novedades</a>{% endif %}
+    </div>
+  </div>
+  <div class="hero-visual">
+    {% if hero %}
+      <img class="photo" src="{{ hero.image_url() }}" alt="{{ hero.name }}">
+      <a class="tag" href="{{ url_for('shop.product_detail', product_id=hero.id) }}">{{ hero.name }} · {{ hero.price | cop }}</a>
+    {% else %}
+      <div class="hero-brand"><img src="{{ url_for('static', filename='logo.jpg') }}" alt="Logotipo de Névora Moda"></div>
+    {% endif %}
+  </div>
+</section>
+<div class="container">
+  {% if categories %}
+  <section class="section" aria-labelledby="cat-title">
+    <div class="section-head"><h2 id="cat-title">Compra por categoría</h2></div>
+    <div class="category-grid">
+      {% for c in categories %}
+        <a class="category-tile" href="{{ url_for('shop.catalogo', category=c.name) }}">
+          <div class="thumb">{% if c.cover %}<img src="{{ c.cover.image_url() }}" alt="" loading="lazy">{% else %}<i class="bi bi-tag" aria-hidden="true"></i>{% endif %}</div>
+          <span class="name">{{ c.name }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+  {% if new_arrivals %}
+  <section class="section" id="novedades" aria-labelledby="nov-title">
+    <div class="section-head"><h2 id="nov-title">Novedades</h2><a href="{{ url_for('shop.catalogo') }}">Ver todo el catálogo</a></div>
+    {{ product_grid(new_arrivals) }}
+  </section>
+  {% endif %}
+  {% if best_sellers %}
+  <section class="section" aria-labelledby="best-title">
+    <div class="section-head"><h2 id="best-title">Lo más vendido</h2></div>
+    {{ product_grid(best_sellers) }}
+  </section>
+  {% endif %}
+  {% if recommended %}
+  <section class="section" aria-labelledby="rec-title">
+    <div class="section-head"><h2 id="rec-title">Pensado para ti</h2><a href="{{ url_for('auth.select_favs') }}">Cambiar mis categorías favoritas</a></div>
+    {{ product_grid(recommended) }}
+  </section>
+  {% endif %}
+  {% if not new_arrivals and not categories %}
+  <section class="section empty-state">
+    <i class="bi bi-bag" aria-hidden="true"></i>
+    <h2 class="mt-3">Estamos preparando la colección</h2>
+    <p class="text-muted">Pronto encontrarás aquí las primeras prendas.</p>
+    {% if current_user.is_authenticated and current_user.is_admin %}<a class="btn btn-dark" href="{{ url_for('admin.create_product') }}">Agregar el primer producto</a>{% endif %}
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

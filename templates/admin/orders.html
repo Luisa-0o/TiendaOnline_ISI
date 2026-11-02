@@ -1,0 +1,18 @@
+{% extends 'admin/base_admin.html' %}
+{% from '_macros.html' import status_badge %}
+{% block title %}Pedidos{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="mb-0">Pedidos</h1>
+  <form method="get" class="d-flex gap-2 align-items-center"><label class="small fw-semibold" for="st">Estado</label>
+    <select id="st" name="status" class="form-select form-select-sm" style="width:auto" data-autosubmit>
+      <option value="">Todos</option>{% for k, v in Order_labels.items() %}<option value="{{ k }}" {{ 'selected' if status == k }}>{{ v }}</option>{% endfor %}
+    </select><noscript><button class="btn btn-sm btn-dark">Filtrar</button></noscript></form>
+</div>
+{% if orders %}
+<div class="panel p-0"><div class="table-responsive"><table class="table align-middle mb-0">
+  <thead><tr><th scope="col">Pedido</th><th scope="col">Cliente</th><th scope="col">Entrega</th><th scope="col">Estado</th><th scope="col" class="text-end">Total</th><th scope="col">Fecha</th><th scope="col"><span class="visually-hidden">Acciones</span></th></tr></thead>
+  <tbody>{% for o in orders %}<tr><th scope="row">#{{ o.id }}</th><td>{{ o.user.username }}<div class="small text-muted">{{ o.user.email }}</div></td><td>{{ o.municipality or '—' }}</td><td>{{ status_badge(o) }}</td><td class="text-end">{{ o.total | cop }}</td><td>{{ o.created_at.strftime('%d/%m/%Y') if o.created_at else '—' }}</td><td class="text-end"><a class="btn btn-sm btn-outline-dark" href="{{ url_for('admin.order_detail', order_id=o.id) }}">Ver</a></td></tr>{% endfor %}</tbody>
+</table></div></div>
+{% else %}<div class="panel empty-state"><p class="mb-0">No hay pedidos con ese filtro.</p></div>{% endif %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'admin/base_admin.html' %}
+{% from '_macros.html' import field %}
+{% block title %}{{ action }} producto{% endblock %}
+{% block content %}
+<h1 class="mb-3">{{ action }} producto</h1>
+<form method="post" enctype="multipart/form-data" class="panel" style="max-width:46rem" novalidate>
+  {{ form.hidden_tag() }}
+  {{ field(form.name) }}{{ field(form.brand) }}
+  <div class="row"><div class="col-md-6">{{ field(form.category) }}</div><div class="col-md-6">{{ field(form.garment_type) }}</div></div>
+  <div class="row"><div class="col-md-6">{{ field(form.price) }}</div><div class="col-md-6">{{ field(form.stock, hint="Solo si la prenda no maneja tallas.") }}</div></div>
+  {{ field(form.sizes) }}
+  {{ field(form.description) }}
+  <div class="mb-3">
+    {{ form.image.label(class_="form-label") }} {{ form.image(class_="form-control") }}
+    {% for e in form.image.errors %}<div class="field-error" role="alert">{{ e }}</div>{% endfor %}
+    {% if product and product.has_image %}<p class="mt-2 mb-1 small">Foto actual:</p><img src="{{ product.image_url() }}" alt="Foto actual de {{ product.name }}" height="90">{% endif %}
+  </div>
+  <button class="btn btn-dark" type="submit">Guardar</button>
+  <a class="btn btn-outline-dark" href="{{ url_for('admin.products') }}">Cancelar</a>
+</form>
+{% endblock %}

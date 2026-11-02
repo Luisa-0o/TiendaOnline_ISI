@@ -1,3 +1,5 @@
+> **Aviso:** este documento describe la versión anterior del proyecto. Para la versión actual consulta el `README.md` raíz y `docs/ARQUITECTURA.md`.
+
 # 👗 Índice de Documentación
 
 Bienvenido a la documentación del Névora Moda! – Sistema de Tienda Online de Ropa. Aquí encontrarás toda la información que necesitas para entender, instalar y usar la aplicación.
